@@ -1,0 +1,1925 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diego NYC Oct '26</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#05060d">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05060d;
+    --card: #0d1424;
+    --card-alt: #090d1a;
+    --border: #22304d;
+    --blue: #4db8ff;
+    --blue-bg: #0e2a42;
+    --red: #ff4d5e;
+    --gold: #e0b83f;
+    --text: #eef3fb;
+    --text-muted: #93a2c0;
+    --text-dim: #5a6a8c;
+    --green: #6fe08a;
+    --orange: #ff9257;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #010103; font-family: 'Barlow', sans-serif; color: var(--text); display: flex; justify-content: center; min-height: 100vh; }
+  .poster { font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; font-weight: 700; color: var(--text); }
+  a, button { font-family: inherit; color: inherit; }
+  select { background: var(--card-alt); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; font-size: 12px; font-family: 'Barlow', sans-serif; }
+  option { background: var(--card-alt); color: var(--text); }
+
+  #phone {
+    width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 15% 8%, rgba(77,184,255,0.16), transparent 60%),
+      radial-gradient(ellipse 55% 35% at 90% 25%, rgba(255,77,94,0.12), transparent 60%),
+      radial-gradient(ellipse 50% 45% at 50% 95%, rgba(224,184,63,0.08), transparent 60%);
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
+  }
+  #phone::before {
+    content: ''; position: absolute; inset: -50px; z-index: 0; pointer-events: none; opacity: 0.55;
+    background-image: radial-gradient(#3a4d78 1px, transparent 1px), radial-gradient(#22304d 1px, transparent 1px), radial-gradient(#1a2440 1.4px, transparent 1.4px);
+    background-size: 22px 22px, 40px 40px, 90px 90px;
+    background-position: 0 0, 11px 11px, 30px 60px;
+    animation: starDrift 140s linear infinite;
+  }
+  @keyframes starDrift { from { background-position: 0 0, 11px 11px, 30px 60px; } to { background-position: -300px 500px, -400px 600px, -270px 660px; } }
+  @keyframes twinkle { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+  .screen { display: none; flex-direction: column; flex: 1; min-height: 100vh; position: relative; z-index: 1; }
+  .screen.active { display: flex; }
+  .scroll { flex: 1; overflow-y: auto; padding: 16px 20px 20px 20px; display: flex; flex-direction: column; gap: 14px; -webkit-overflow-scrolling: touch; }
+  .scroll::-webkit-scrollbar { width: 0; }
+  .footer-credit { text-align: center; color: var(--text-dim); font-size: 10px; padding-top: 6px; letter-spacing: 0.5px; }
+  .back-btn { color: var(--text); cursor: pointer; display: inline-flex; background: none; border: none; padding: 0; }
+  .header-row { padding: 18px 20px 0 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .chip { padding: 8px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; cursor: pointer; border: none; color: var(--text-muted); transition: transform .1s; }
+  .chip:active { transform: scale(0.95); }
+  .chip-off { background: var(--border); color: var(--text-muted); }
+  .chip-on { background: var(--red); color: #fff; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: var(--text); }
+  input[type=text] { font-family: 'Barlow', sans-serif; color: var(--text); }
+  label { cursor: pointer; }
+  .tag { background: #10182c; color: #9db0d0; font-size: 10px; padding: 2px 7px; border-radius: 10px; margin-right: 4px; display: inline-block; }
+  .tag-gold { background: #2a2008; color: var(--gold); border: 1px solid #4a3a10; }
+  .tag-green { background: #0f2417; color: var(--green); border: 1px solid #1f4a30; }
+  .tag-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid #1e4a6a; }
+  .inline-add { display: none; margin-top: 8px; gap: 8px; }
+  .inline-add.show { display: flex; }
+  .inline-add input, .inline-add select { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--text); font-size: 13px; }
+  .inline-add button { background: var(--gold); color: #05060d; border: none; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+  .acc-item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color .2s; }
+  .acc-item.open { border-color: var(--blue); }
+  .acc-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+  .acc-icon { font-size: 20px; width: 30px; text-align: center; flex-shrink: 0; }
+  .acc-title-wrap { flex: 1; min-width: 0; }
+  .acc-title { color: var(--text); font-size: 14px; font-weight: 700; }
+  .acc-badge { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+  .acc-chevron { transition: transform .2s; flex-shrink: 0; }
+  .acc-item.open .acc-chevron { transform: rotate(180deg); }
+  .acc-body { display: none; padding: 0 16px 16px 16px; border-top: 1px solid var(--border); padding-top: 12px; animation: fadeIn .2s ease; }
+  .acc-item.open .acc-body { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .acc-link { color: var(--blue); font-size: 12px; font-weight: 700; display: inline-block; margin-top: 8px; cursor: pointer; }
+
+  .day-acc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .day-acc.comic { border-color: var(--red); }
+  .day-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; }
+  .day-body { display: none; padding: 0 16px 16px 16px; animation: fadeIn .2s ease; }
+  .day-acc.open .day-body { display: block; }
+  .day-acc.open .day-chevron { transform: rotate(180deg); }
+  .day-chevron { transition: transform .2s; }
+
+  .pack-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .pack-row:last-of-type { border-bottom: none; }
+  .pack-row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); flex-shrink: 0; }
+  .pack-row .pack-label { color: var(--text); }
+  .pack-row .pack-label.checked { text-decoration: line-through; color: var(--text-dim); }
+  .pack-group-title { color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 4px 0; }
+  .pack-group-title:first-child { margin-top: 0; }
+
+  .doc-file-row { display: flex; align-items: center; gap: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-top: 6px; }
+  .doc-thumb { width: 34px; height: 34px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--border); }
+
+  .bottom-nav { flex-shrink: 0; display: flex; align-items: stretch; justify-content: space-around; background: var(--card-alt); border-top: 1px solid var(--border); padding: 7px 2px 9px 2px; position: relative; z-index: 2; overflow-x: auto; }
+  .bn-item { display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 7.5px; font-weight: 700; padding: 3px 1px; flex: 1; min-width: 40px; }
+  .bn-item.active { color: var(--blue); }
+  .bn-icon { font-size: 15px; line-height: 1; }
+
+  .eye-btn { background: var(--card); border: 1px solid var(--border); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); font-size: 14px; }
+
+  .cd-box { display: flex; gap: 8px; justify-content: center; }
+  .cd-seg { background: var(--card); border: 1px solid var(--blue); border-radius: 10px; padding: 8px 4px; text-align: center; flex: 1; box-shadow: 0 0 12px rgba(77,184,255,0.25); }
+  .cd-num { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 22px; color: var(--text); animation: twinkle 3s ease-in-out infinite; }
+  .cd-lbl { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  .quick-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .suggest-card { background: var(--card-alt); border: 1px dashed var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div id="update-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:9999; background:#e0b83f; color:#05060d; font-family:'Barlow',sans-serif; font-size:13px; font-weight:700; padding:10px 16px; display:none; align-items:center; justify-content:center; gap:12px;">
+  <span data-en="A new version is available">Hay una actualización disponible</span>
+  <button id="update-banner-btn" style="background:#05060d; color:#e0b83f; border:none; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;" data-en="Update now">Actualizar ahora</button>
+</div>
+
+<div id="phone">
+
+  <!-- ============ HOME (simplificado) ============ -->
+  <section class="screen active" id="screen-home">
+    <div style="padding: 16px 20px 0 20px; display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; cursor: pointer;" onclick="toggleLang()">
+        <span id="lang-es-label" style="color: var(--gold); font-size: 12px; font-weight: 700;">ES</span>
+        <span style="color: #3a445e; font-size: 12px;">/</span>
+        <span id="lang-en-label" style="color: #5a6785; font-size: 12px; font-weight: 700;">EN</span>
+      </div>
+    </div>
+
+    <div style="text-align: center; padding: 4px 20px 0 20px; flex-shrink: 0;">
+      <div class="poster" style="font-size: 30px; text-shadow: 0 0 20px rgba(77,184,255,0.5);">DIEGO NYC</div>
+      <div style="color: var(--text-muted); font-style: italic; font-size: 12px; margin-top: 4px;" data-en="&quot;May adventure be with you&quot; 🌌">"Que la aventura te acompañe" 🌌</div>
+      <div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px;">
+        <span style="color: var(--red); font-size: 11px; font-weight: 700;">7–12 OCT</span>
+        <span style="color: var(--text-dim); font-size: 11px;">·</span>
+        <span style="color: var(--text-muted); font-size: 11px;">NYC</span>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="cd-box">
+        <div class="cd-seg"><div class="cd-num" id="cd-days">--</div><div class="cd-lbl" data-en="days">días</div></div>
+        <div class="cd-seg"><div class="cd-num" id="cd-hours">--</div><div class="cd-lbl" data-en="hrs">hrs</div></div>
+        <div class="cd-seg"><div class="cd-num" id="cd-mins">--</div><div class="cd-lbl" data-en="min">min</div></div>
+      </div>
+
+      <div class="card" style="padding: 10px 12px 14px 12px;">
+        <div style="color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 4px;" data-en="Trip constellation">Constelación del viaje</div>
+        <svg id="constellation-svg" viewBox="0 0 340 80" width="100%" height="80"></svg>
+      </div>
+
+      <div class="card" style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span id="ny-time" style="font-size: 16px; font-weight: 700;">--:--</span>
+          <span style="color: var(--text-muted); font-size: 11px;">NY</span>
+        </div>
+        <div style="width: 1px; height: 20px; background: var(--border);"></div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M14 4a2 2 0 0 0-4 0v9.5a4 4 0 1 0 4 0V4Z"/></svg>
+          <span id="ny-temp" style="font-size: 16px; font-weight: 700;">--°C</span>
+        </div>
+      </div>
+
+      <div class="quick-card" onclick="go('presupuesto')">
+        <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--blue-bg); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">💰</div>
+        <div style="flex: 1;">
+          <div style="font-size: 13px; font-weight: 700;" data-en="Budget">Presupuesto</div>
+          <div style="color: var(--text-muted); font-size: 11px;"><span id="home-avail" class="money-value" style="color: var(--green); font-weight: 700;">US$ 660</span> <span data-en="available">disponible</span></div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+
+      <div class="quick-card" style="border-color: var(--gold);" onclick="go('itinerario');openDay(3)">
+        <div style="width: 42px; height: 42px; border-radius: 10px; background: #2a2008; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">🎟</div>
+        <div style="flex: 1;">
+          <div style="font-size: 13px; font-weight: 700;">COMIC CON</div>
+          <div style="color: var(--text-muted); font-size: 11px;" data-en="Fri Oct 9 · ticket confirmed ✓">Vie 9 oct · entrada confirmada ✓</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+
+    <div class="bottom-nav" id="nav-home">
+      <button class="bn-item active" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+
+  <!-- ============ PREPARACION (Equipaje + Pendientes) ============ -->
+  <section class="screen" id="screen-prep">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 20px;" data-en="PREPARATION">PREPARACIÓN</div>
+    </div>
+
+    <div class="scroll">
+      <div class="acc-item open" id="acc-equipaje">
+        <div class="acc-header" onclick="toggleAcc('acc-equipaje')">
+          <div class="acc-icon">🎒</div>
+          <div class="acc-title-wrap"><div class="acc-title" data-en="Packing">Equipaje</div><div class="acc-badge" id="badge-equipaje">0/22 listo</div></div>
+          <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="acc-body" id="pack-list">
+          <div class="pack-group-title" data-en="Documents & money">Documentos y dinero</div>
+          <div class="pack-row" data-id="k1"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Valid passport">Pasaporte vigente</span></div>
+          <div class="pack-row" data-id="k2"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Hotel booking confirmation (printed or downloaded)">Comprobante de reserva del hotel (impreso o descargado)</span></div>
+          <div class="pack-row" data-id="k3"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Boarding pass (printed or on phone)">Pase de abordar (impreso o en el celular)</span></div>
+          <div class="pack-row" data-id="k4"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Printed insurance policy">Póliza de seguro impresa</span></div>
+          <div class="pack-row" data-id="k5"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="International debit card">Tarjeta débito internacional</span></div>
+          <div class="pack-row" data-id="k6"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Bank debit activated for use abroad">Débito del banco activado para el extranjero</span></div>
+          <div class="pack-row" data-id="k7"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Cash in USD">Efectivo en USD</span></div>
+
+          <div class="pack-group-title" data-en="Electronics">Electrónica</div>
+          <div class="pack-row" data-id="k8"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Phone + charger">Celular + cargador</span></div>
+          <div class="pack-row" data-id="k9"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Universal plug adapter">Adaptador universal de enchufe</span></div>
+          <div class="pack-row" data-id="k10"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Power bank">Power bank</span></div>
+          <div class="pack-row" data-id="k11"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Headphones">Auriculares</span></div>
+          <div class="pack-row" data-id="k12"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Waterproof phone pouch">Bolsa impermeable para el celular</span></div>
+
+          <div class="pack-group-title" data-en="Clothing">Ropa</div>
+          <div class="pack-row" data-id="k13"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Light t-shirts">Poleras livianas</span></div>
+          <div class="pack-row" data-id="k14"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Pants/jeans">Pantalón/jeans</span></div>
+          <div class="pack-row" data-id="k15"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Light warm jacket">Abrigo liviano</span></div>
+          <div class="pack-row" data-id="k16"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Sweater">Sweater</span></div>
+          <div class="pack-row" data-id="k17"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Night outfit">Outfit de noche</span></div>
+          <div class="pack-row" data-id="k18"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Outfit for a special occasion">Outfit para ocasión especial</span></div>
+          <div class="pack-row" data-id="k19"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Day & night shoes">Calzado día/noche</span></div>
+
+          <div class="pack-group-title" data-en="Toiletries">Neceser</div>
+          <div class="pack-row" data-id="k20"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Microfiber towels">Toallas de microfibra</span></div>
+          <div class="pack-row" data-id="k21"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Toothbrush & toothpaste">Cepillo y pasta de dientes</span></div>
+          <div class="pack-row" data-id="k22"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Sunscreen">Protector solar</span></div>
+          <div class="pack-row" data-id="k23"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Basic first aid kit">Botiquín básico</span></div>
+
+          <div class="pack-group-title" data-en="Hotel">Hostal/hotel</div>
+          <div class="pack-row" data-id="k24"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Locker padlock (if needed)">Candado para locker (si aplica)</span></div>
+
+          <div class="pack-group-title" data-en="Extras">Extras</div>
+          <div class="pack-row" data-id="k25"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Packing organizers/cubes">Organizadores de equipaje</span></div>
+          <div class="pack-row" data-id="k26"><input type="checkbox" onchange="togglePack(this)"><span class="pack-label" data-en="Dirty laundry bag">Bolsa para ropa sucia</span></div>
+
+          <div class="inline-add show" style="margin-top: 10px;">
+            <input id="pack-new-item" type="text" placeholder="Agregar ítem...">
+            <button onclick="addPack()" data-en="Add">Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" id="acc-pendientes">
+        <div class="acc-header" onclick="toggleAcc('acc-pendientes')">
+          <div class="acc-icon">✅</div>
+          <div class="acc-title-wrap"><div class="acc-title" data-en="To-do before flying">Pendientes antes de viajar</div><div class="acc-badge" id="badge-pendientes">0/7 listo</div></div>
+          <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="acc-body" id="pend-list">
+          <div class="pack-row" data-id="d1"><input type="checkbox" onchange="togglePend(this)"><span class="pack-label" data-en="Online check-in, outbound & return">Check-in online ida y vuelta</span></div>
+          <div class="pack-row" data-id="d2"><input type="checkbox" onchange="togglePend(this)"><span class="pack-label" data-en="Save boarding passes">Guardar tarjetas de embarque</span></div>
+          <div class="pack-row" data-id="d3"><input type="checkbox" onchange="togglePend(this)"><span class="pack-label" data-en="Save insurance policy N° and emergency phone">Guardar N° de póliza y teléfono de emergencia del seguro</span></div>
+          <div class="pack-row" data-id="d4"><input type="checkbox" onchange="togglePend(this)"><span class="pack-label" data-en="Check roaming/phone plan before flying">Revisar roaming/plan celular antes de viajar</span></div>
+          <div class="pack-row" data-id="d5"><input type="checkbox" onchange="togglePend(this)"><span class="pack-label" data-en="Withdraw cash (USD)">Sacar efectivo en USD</span></div>
+          <div class="pack-row" data-id="d6"><input type="checkbox" onchange="togglePend(this)"><span class="pack-label" data-en="Share itinerary with someone you trust">Avisar itinerario a alguien de confianza</span></div>
+          <div class="pack-row" data-id="d7"><input type="checkbox" onchange="togglePend(this)"><span class="pack-label" data-en="Check real forecast the week before">Revisar pronóstico real la semana antes</span></div>
+          <div class="inline-add show" style="margin-top: 10px;">
+            <input id="pend-new-item" type="text" placeholder="Agregar pendiente...">
+            <button onclick="addPend()" data-en="Add">Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-item" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item active" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+
+  <!-- ============ DOCUMENTOS ============ -->
+  <section class="screen" id="screen-documentos">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 20px;" data-en="DOCUMENTS">DOCUMENTOS</div>
+    </div>
+    <div style="padding: 6px 20px 0 20px;"><div style="color: var(--text-muted); font-size: 11px;" data-en="Upload as image (JPG) or PDF">Sube como imagen (JPG) o PDF</div></div>
+
+    <div class="scroll" id="doc-categories">
+      <div class="card" style="padding: 14px 16px;" data-cat="ida">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: var(--gold); font-size: 13px; font-weight: 700;">✈️ <span data-en="Outbound ticket">Ticket de ida</span></span>
+          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'ida')"></label>
+        </div>
+        <div class="doc-files" data-cat="ida"></div>
+      </div>
+      <div class="card" style="padding: 14px 16px;" data-cat="vuelta">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: var(--gold); font-size: 13px; font-weight: 700;">🛬 <span data-en="Return ticket">Ticket de vuelta</span></span>
+          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'vuelta')"></label>
+        </div>
+        <div class="doc-files" data-cat="vuelta"></div>
+      </div>
+      <div class="card" style="padding: 14px 16px;" data-cat="seguro">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: var(--gold); font-size: 13px; font-weight: 700;">🛡 <span data-en="Travel insurance">Seguro de viaje</span></span>
+          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'seguro')"></label>
+        </div>
+        <div class="doc-files" data-cat="seguro"></div>
+      </div>
+      <div class="card" style="padding: 14px 16px;" data-cat="hospedaje">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: var(--gold); font-size: 13px; font-weight: 700;">🏨 <span data-en="Lodging">Hospedaje</span></span>
+          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'hospedaje')"></label>
+        </div>
+        <div class="doc-files" data-cat="hospedaje"></div>
+      </div>
+
+      <div id="custom-doc-slots"></div>
+      <button id="btn-add-custom-doc" onclick="promptCustomDoc()" style="background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--blue); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add additional document (up to 4)">+ Agregar documento adicional (hasta 4)</button>
+      <div id="custom-add-row" class="inline-add">
+        <input id="custom-doc-title" type="text" placeholder="Nombre del documento">
+        <button onclick="confirmCustomDoc()" data-en="Add">Agregar</button>
+      </div>
+
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-item" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item active" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+
+  <!-- ============ PANORAMAS ============ -->
+  <section class="screen" id="screen-panoramas">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 18px; line-height: 1;" data-en="MUST-SEE SPOTS">PANORAMAS IMPERDIBLES</div>
+    </div>
+
+    <div id="panorama-filter-chips" style="padding: 12px 20px 0 20px; flex-shrink: 0; display: flex; gap: 8px; overflow-x: auto;">
+      <button class="chip chip-on" onclick="filterPanoramas(this,'all')" data-en="All">Todos</button>
+      <button class="chip chip-off" onclick="filterPanoramas(this,'rock')">🎸 Rock</button>
+      <button class="chip chip-off" onclick="filterPanoramas(this,'comic')">🦸 <span data-en="Comics">Cómic</span></button>
+      <button class="chip chip-off" onclick="filterPanoramas(this,'clasico')">🗽 <span data-en="Classics">Clásicos</span></button>
+      <button class="chip chip-off" onclick="filterPanoramas(this,'cultura')">🎬 <span data-en="Culture">Cultura</span></button>
+      <button class="chip chip-off" onclick="filterPanoramas(this,'club')">🎧 <span data-en="Clubs">Clubes</span></button>
+      <button class="chip chip-off" onclick="filterPanoramas(this,'bar')">🍸 <span data-en="Bars">Bares</span></button>
+    </div>
+
+    <div class="scroll" id="panorama-list">
+      <div class="card panorama-item" data-id="p1" data-cat="clasico" data-visited="true" style="border-color: var(--green); padding: 12px 14px; opacity: 0.75;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700; text-decoration: line-through;">Times Square</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Broadway & W 42-47th St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p2" data-cat="clasico" data-visited="true" style="border-color: var(--green); padding: 12px 14px; opacity: 0.75;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700; text-decoration: line-through;">Empire State Building</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 350 Fifth Ave, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p3" data-cat="comic" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Forbidden Planet</div><span style="color: var(--text-muted); font-size: 10px;">🦸 <span data-en="Comics · iconic store">Cómic · tienda icónica</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 832 Broadway, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3" selected>Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p4" data-cat="rock" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Rockwood Music Hall</div><span style="color: var(--text-muted); font-size: 10px;">🎸 <span data-en="Rock · live shows">Rock · shows en vivo</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 196 Allen St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p5" data-cat="rock" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Rough Trade NYC</div><span style="color: var(--text-muted); font-size: 10px;">🎸 <span data-en="Rock · vinyl record store">Rock · disquería de vinilos</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Williamsburg, Brooklyn</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p6" data-cat="rock" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Zona histórica CBGB (Bowery)</div><span style="color: var(--text-muted); font-size: 10px;">🎸 <span data-en="Rock · birthplace of NY punk">Rock · cuna del punk NY</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 315 Bowery, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p7" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">The High Line</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Gansevoort St a W 34th St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p8" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Brooklyn Bridge</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Entre City Hall Park (Manhattan) y Cadman Plaza (Brooklyn)</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p9" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Coney Island</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic · 20th NYCC theme">Clásico · tema 20° NYCC</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Surf Ave, Brooklyn</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p10" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">St. Patrick's Cathedral</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic · has light installations some nights">Clásico · algunas noches con instalación de luces</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 5th Ave & 51st St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p11" data-cat="cultura" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Lincoln Center — New York Film Festival</div><span style="color: var(--text-muted); font-size: 10px;">🎬 <span data-en="Runs through Oct 12 — coincides with your trip">Corre hasta el 12 oct — coincide con tu viaje</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 10 Lincoln Center Plaza, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p12" data-cat="club" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">House of Yes</div><span style="color: var(--text-muted); font-size: 10px;">🎧 <span data-en="Club · eclectic Brooklyn nightlife">Club · vida nocturna ecléctica en Brooklyn</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 2 Wyckoff Ave, Brooklyn</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p13" data-cat="club" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Elsewhere (Bushwick)</div><span style="color: var(--text-muted); font-size: 10px;">🎧 <span data-en="Club · live music + dance floors">Club · música en vivo y pistas de baile</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 599 Johnson Ave, Brooklyn</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p14" data-cat="bar" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Arlene's Grocery</div><span style="color: var(--text-muted); font-size: 10px;">🍸 <span data-en="Bar · rock bands live, Lower East Side">Bar · bandas de rock en vivo, Lower East Side</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 95 Stanton St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p15" data-cat="bar" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">The Django</div><span style="color: var(--text-muted); font-size: 10px;">🍸 <span data-en="Bar · jazz basement, cocktails">Bar · sótano de jazz y cócteles</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 2 Ave of the Americas (Roxy Hotel), Tribeca</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="p16" data-cat="cultura" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Comedy Cellar</div><span style="color: var(--text-muted); font-size: 10px;">🎬 <span data-en="Culture · iconic NY comedy club">Cultura · club de comedia icónico de NY</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 117 MacDougal St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <button onclick="document.getElementById('panorama-add-row').classList.toggle('show')" style="margin-top: 4px; background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--gold); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add spot">+ Agregar panorama</button>
+      <div id="panorama-add-row" class="inline-add">
+        <input id="panorama-new-name" type="text" placeholder="Nombre del lugar">
+        <button onclick="addPanorama()" data-en="Add">Agregar</button>
+      </div>
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-item" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item active" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+  <!-- ============ ITINERARIO ============ -->
+  <section class="screen" id="screen-itinerario">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 20px;" data-en="ITINERARY">ITINERARIO</div>
+    </div>
+
+    <div class="scroll" id="itinerario-days">
+      <div class="day-acc" id="day-acc-1">
+        <div class="day-header" onclick="toggleDay(1)">
+          <span class="poster" style="font-size: 15px; flex: 1;"><span data-en="Day">Día</span> 1 · 7 oct</span>
+          <span id="day-subtotal-1" class="money-value" style="color: var(--text-muted); font-size: 12px;">US$ 0</span>
+          <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="day-body">
+          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Times Square</div><div style="color: var(--text-muted); font-size: 11px;">📌 Broadway & W 42-47th St, Manhattan</div></div>
+          <div class="day-panoramas" id="day-panoramas-1"></div>
+          <div class="day-expenses" data-day="1"></div>
+          <div id="day-empty-1" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
+          <button onclick="go('nuevogasto');preselectDay(1)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
+        </div>
+      </div>
+
+      <div class="day-acc" id="day-acc-2">
+        <div class="day-header" onclick="toggleDay(2)">
+          <span class="poster" style="font-size: 15px; flex: 1;"><span data-en="Day">Día</span> 2 · 8 oct</span>
+          <span id="day-subtotal-2" class="money-value" style="color: var(--text-muted); font-size: 12px;">US$ 0</span>
+          <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="day-body">
+          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Empire State Building</div><div style="color: var(--text-muted); font-size: 11px;">📌 350 Fifth Ave, Manhattan</div></div>
+          <div class="day-panoramas" id="day-panoramas-2"></div>
+          <div class="day-expenses" data-day="2"></div>
+          <div id="day-empty-2" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
+          <button onclick="go('nuevogasto');preselectDay(2)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
+        </div>
+      </div>
+
+      <div class="day-acc comic open" id="day-acc-3">
+        <div class="day-header" onclick="toggleDay(3)">
+          <span class="poster" style="font-size: 15px; flex: 1;"><span data-en="Day">Día</span> 3 · 9 oct 🎟</span>
+          <span id="day-subtotal-3" class="money-value" style="color: var(--gold); font-size: 12px; font-weight: 700;">US$ 210</span>
+          <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="day-body">
+          <div class="card" style="border-color: var(--red); padding: 12px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--red); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="2.2"><path d="M4 20V6a2 2 0 0 1 2-2h6l8 8v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M12 4v6h6"/></svg></div>
+            <div><div class="poster" style="font-size: 14px;">NEW YORK COMIC CON</div><div style="color: var(--green); font-size: 11px; font-weight: 700;" data-en="Ticket confirmed ✓ · Hayden Christensen, Ian McDiarmid">Entrada confirmada ✓ · Hayden Christensen, Ian McDiarmid</div><div style="color: var(--text-muted); font-size: 10px; margin-top: 2px;">📌 429 11th Ave (Javits Center), Manhattan</div></div>
+          </div>
+
+          <div class="card" style="padding: 12px 14px; margin-bottom: 10px;">
+            <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 6px;" data-en="🧸 Figures & collectibles">🧸 Figuras y coleccionables</div>
+            <div id="figura-list">
+              <div id="figura-empty" style="color: var(--text-muted); font-size: 12px; padding: 4px 0;" data-en="No figures logged yet — add what you're hoping to get.">Aún no registras figuras — agrega las que esperas conseguir.</div>
+            </div>
+            <div class="inline-add show">
+              <input id="figura-new-item" type="text" placeholder="Ej: Funko Anakin Skywalker">
+              <button onclick="addFigura()" data-en="Add">Agregar</button>
+            </div>
+          </div>
+          <div class="day-panoramas" id="day-panoramas-3"></div>
+          <div class="day-expenses" data-day="3"></div>
+          <div id="day-empty-3" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
+          <button onclick="go('nuevogasto');preselectDay(3)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
+        </div>
+      </div>
+
+      <div class="day-acc" id="day-acc-4">
+        <div class="day-header" onclick="toggleDay(4)">
+          <span class="poster" style="font-size: 15px; flex: 1;"><span data-en="Day">Día</span> 4 · 10 oct</span>
+          <span id="day-subtotal-4" class="money-value" style="color: var(--text-muted); font-size: 12px;">US$ 0</span>
+          <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="day-body">
+          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Brooklyn Bridge</div><div style="color: var(--text-muted); font-size: 11px;">📌 Entre City Hall Park y Cadman Plaza</div></div>
+          <div class="day-panoramas" id="day-panoramas-4"></div>
+          <div class="day-expenses" data-day="4"></div>
+          <div id="day-empty-4" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
+          <button onclick="go('nuevogasto');preselectDay(4)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
+        </div>
+      </div>
+
+      <div class="day-acc" id="day-acc-5">
+        <div class="day-header" onclick="toggleDay(5)">
+          <span class="poster" style="font-size: 15px; flex: 1;"><span data-en="Day">Día</span> 5 · 11 oct</span>
+          <span id="day-subtotal-5" class="money-value" style="color: var(--text-muted); font-size: 12px;">US$ 0</span>
+          <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="day-body">
+          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">St. Patrick's Cathedral</div><div style="color: var(--text-muted); font-size: 11px;">📌 5th Ave & 51st St, Manhattan</div></div>
+          <div class="day-panoramas" id="day-panoramas-5"></div>
+          <div class="day-expenses" data-day="5"></div>
+          <div id="day-empty-5" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
+          <button onclick="go('nuevogasto');preselectDay(5)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
+        </div>
+      </div>
+
+      <div class="day-acc" id="day-acc-6">
+        <div class="day-header" onclick="toggleDay(6)">
+          <span class="poster" style="font-size: 15px; flex: 1;"><span data-en="Day">Día</span> 6 · 12 oct <span data-en="(return)">(regreso)</span></span>
+          <span id="day-subtotal-6" class="money-value" style="color: var(--text-muted); font-size: 12px;">US$ 0</span>
+          <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="day-body">
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;" data-en="Flight back to Chile. Heads up: Columbus Day Parade runs 5th Ave. 11:30am-3:30pm — check it fits before heading to the airport.">Vuelo de regreso a Chile. Ojo: el Columbus Day Parade pasa por la 5ta Ave. de 11:30am a 3:30pm — revisa si calza antes de ir al aeropuerto.</div>
+          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;" data-en="Central Park (if the flight leaves in the afternoon)">Central Park (si el vuelo sale en la tarde)</div><div style="color: var(--text-muted); font-size: 11px;">📌 5th Ave & 59th St, Manhattan</div></div>
+          <div class="day-panoramas" id="day-panoramas-6"></div>
+          <div class="day-expenses" data-day="6"></div>
+          <div id="day-empty-6" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
+          <button onclick="go('nuevogasto');preselectDay(6)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
+        </div>
+      </div>
+
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+
+    <button onclick="go('nuevogasto')" style="position: absolute; bottom: 74px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--gold); border: 2px solid var(--text); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(77,184,255,0.35); cursor: pointer; z-index: 3;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <div class="bottom-nav">
+      <button class="bn-item" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item active" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+  <!-- ============ NUEVO GASTO ============ -->
+  <section class="screen" id="screen-nuevogasto">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('itinerario')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 20px;" data-en="NEW EXPENSE">NUEVO GASTO</div>
+    </div>
+    <div class="scroll">
+      <div class="card" style="padding: 18px; text-align: center;">
+        <label style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;" data-en="Amount (USD)">Monto (USD)</label>
+        <div style="display: flex; align-items: baseline; justify-content: center; gap: 6px; margin-top: 6px;">
+          <span style="color: var(--gold); font-size: 28px; font-weight: 700;">US$</span>
+          <input id="gasto-amount" type="text" value="0" style="background: none; border: none; font-size: 40px; font-weight: 700; width: 140px; text-align: center;">
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Description">Descripción</label>
+        <input id="gasto-desc" type="text" placeholder="Ej: Merch de la Comic Con" style="width: 100%; margin-top: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 14px;">
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Trip day">Día del viaje</label>
+        <div id="gasto-day-chips" style="display: flex; gap: 8px; margin-top: 8px; overflow-x: auto;">
+          <button class="chip chip-off" data-day="1" onclick="selectChip(this,'gasto-day-chips')"><span data-en="Day">Día</span> 1 · 7</button>
+          <button class="chip chip-off" data-day="2" onclick="selectChip(this,'gasto-day-chips')"><span data-en="Day">Día</span> 2 · 8</button>
+          <button class="chip chip-on" data-day="3" onclick="selectChip(this,'gasto-day-chips')"><span data-en="Day">Día</span> 3 · 9 🎟</button>
+          <button class="chip chip-off" data-day="4" onclick="selectChip(this,'gasto-day-chips')"><span data-en="Day">Día</span> 4 · 10</button>
+          <button class="chip chip-off" data-day="5" onclick="selectChip(this,'gasto-day-chips')"><span data-en="Day">Día</span> 5 · 11</button>
+          <button class="chip chip-off" data-day="6" onclick="selectChip(this,'gasto-day-chips')"><span data-en="Day">Día</span> 6 · 12</button>
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Category">Categoría</label>
+        <div id="gasto-cat-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-cat-chips')">🏨 <span data-en="Lodging">Alojamiento</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-cat-chips')">🚕 <span data-en="Transport">Transporte</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-cat-chips')">🍔 <span data-en="Food">Comida</span></button>
+          <button class="chip chip-on" onclick="selectChip(this,'gasto-cat-chips')">🎟 <span data-en="Tickets/activities">Entradas/actividades</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-cat-chips')">🛍 <span data-en="Shopping">Compras</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-cat-chips')">🎁 <span data-en="Gifts">Regalos</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-cat-chips')">🙌 <span data-en="Tips">Propinas</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-cat-chips')">+ <span data-en="Other">Otra</span></button>
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Payment method">Forma de pago</label>
+        <div id="gasto-pay-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+          <button class="chip chip-on" style="background: var(--gold); color: #05060d;" onclick="selectChip(this,'gasto-pay-chips')">💵 <span data-en="Cash">Efectivo</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-pay-chips')">💳 <span data-en="Credit">Crédito</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-pay-chips')">💳 <span data-en="Debit">Débito</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'gasto-pay-chips')">🔄 <span data-en="Transfer">Transferencia</span></button>
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Whose expense is this?">¿De quién es este gasto?</label>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+          <label id="quien-solo" onclick="selectQuien('quien-solo')" style="display: flex; align-items: center; gap: 10px; background: var(--gold); border: 1px solid var(--gold); border-radius: 10px; padding: 10px 12px;">
+            <input type="radio" name="quien" value="solo" checked style="accent-color: #05060d;"><span style="color: #05060d; font-size: 13px; font-weight: 700;" data-en="Just me">Solo yo</span>
+          </label>
+          <label id="quien-comp1" onclick="selectQuien('quien-comp1')" style="display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;">
+            <input type="radio" name="quien" value="comp1" style="accent-color: var(--blue);"><span style="font-size: 13px;" data-en="I paid, shared with Esteban">Yo pagué, compartido con Esteban</span>
+          </label>
+          <label id="quien-comp2" onclick="selectQuien('quien-comp2')" style="display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;">
+            <input type="radio" name="quien" value="comp2" style="accent-color: var(--blue);"><span style="font-size: 13px;" data-en="Esteban paid for me">Esteban pagó por mí</span>
+          </label>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <label style="flex: 1; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--gold); border-radius: 10px; padding: 10px 12px;">
+          <span style="color: var(--gold); font-size: 12px; font-weight: 700;" data-en="⚡ Unplanned">⚡ Imprevisto</span><input id="chk-imprevisto" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--gold);">
+        </label>
+        <label style="flex: 1; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;">
+          <span style="font-size: 12px; font-weight: 700;" data-en="🙌 Tip">🙌 Propina</span><input id="chk-propina" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--green);">
+        </label>
+      </div>
+      <button onclick="saveMainExpense()" style="margin-top: 6px; background: var(--gold); color: #05060d; text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer;" data-en="Save expense">Guardar gasto</button>
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+  </section>
+
+  <!-- ============ PRESUPUESTO ============ -->
+  <section class="screen" id="screen-presupuesto">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 20px; flex: 1;" data-en="BUDGET">PRESUPUESTO</div>
+      <button class="eye-btn" id="eye-btn" onclick="toggleMoneyVisibility()">👁</button>
+    </div>
+    <div class="scroll">
+      <div class="card" style="padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: var(--text-muted); font-size: 11px;" data-en="Fixed budget">Presupuesto fijo</span>
+          <button onclick="editBudget()" style="background: none; border: none; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer;" data-en="✎ Edit">✎ Editar</button>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: baseline; margin-top: 2px;">
+          <div id="pres-budget-amount" class="money-value" style="font-size: 22px; font-weight: 700;">US$ 1.800</div>
+          <div id="pres-budget-clp" class="money-value" style="color: var(--text-muted); font-size: 12px;">≈ $1.728.900 CLP</div>
+        </div>
+        <div id="budget-edit-row" class="inline-add" style="margin-top: 8px; flex-direction: column; align-items: stretch;">
+          <div style="display: flex; gap: 8px;">
+            <input id="budget-usd-value" type="text" placeholder="Monto en USD" oninput="syncBudgetFromUsd()">
+            <input id="budget-clp-value" type="text" placeholder="Monto en CLP" oninput="syncBudgetFromClp()">
+          </div>
+          <button onclick="confirmBudget()" style="margin-top: 8px;" data-en="Save">Guardar</button>
+        </div>
+
+        <div style="height: 1px; background: var(--border); margin: 14px 0;"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span class="poster" style="font-size: 14px;" data-en="BALANCE">BALANCE</span>
+          <span id="pres-pct" style="color: var(--gold); font-size: 12px; font-weight: 700;">63% <span data-en="used">usado</span></span>
+        </div>
+        <div style="height: 10px; background: var(--bg); border-radius: 6px; margin-top: 10px; overflow: hidden; border: 1px solid var(--border);">
+          <div id="pres-bar" style="width: 63%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--red)); transition: width .3s;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 12px;">
+          <div><div style="color: var(--text-muted); font-size: 11px;" data-en="Spent">Gastado</div><div id="pres-spent" class="money-value" style="font-size: 15px; font-weight: 700;">US$ 1.140</div></div>
+          <div style="text-align: right;"><div style="color: var(--text-muted); font-size: 11px;" data-en="Available">Disponible</div><div id="pres-avail2" class="money-value" style="color: var(--green); font-size: 15px; font-weight: 700;">US$ 660</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 14px 16px; display: flex; align-items: center; gap: 14px;">
+        <svg id="radar-svg" viewBox="0 0 100 60" width="90" height="54"></svg>
+        <div>
+          <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase;" data-en="Unplanned radar">Radar de imprevistos</div>
+          <div id="radar-pct-label" style="font-size: 18px; font-weight: 700; margin-top: 2px;">6%</div>
+          <div style="color: var(--text-muted); font-size: 10px;" data-en="of your spending was unplanned">de tu gasto fue imprevisto</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 14px 16px;">
+        <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; margin-bottom: 8px;" data-en="By payment method (whole trip)">Por forma de pago (todo el viaje)</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">💵</span><span id="pay-total-efectivo" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span></div>
+          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">💳</span><span id="pay-total-credito" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span><span style="color: var(--text-muted); font-size: 10px;" data-en="cr.">créd.</span></div>
+          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">💳</span><span id="pay-total-debito" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span><span style="color: var(--text-muted); font-size: 10px;" data-en="db.">déb.</span></div>
+          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">🔄</span><span id="pay-total-transferencia" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 16px;">
+        <div class="poster" style="font-size: 14px; margin-bottom: 10px;" data-en="EXCHANGE RATE">TIPO DE CAMBIO</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted);">
+          <span>1 USD = 960,50 CLP</span><span>1 USD = 0,86 EUR</span>
+        </div>
+        <div style="height: 1px; background: var(--border); margin: 12px 0;"></div>
+        <label style="color: var(--text-muted); font-size: 11px;" data-en="Convert">Convertir</label>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+          <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px; display: flex; align-items: center; gap: 4px;">
+            <span style="color: var(--gold); font-size: 12px; font-weight: 700;">US$</span><input id="convert-usd" type="text" value="100" oninput="recalcConvert()" style="background: none; border: none; font-size: 14px; font-weight: 700; width: 100%;">
+          </div>
+          <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px;"><span style="color: var(--red); font-size: 11px; font-weight: 700;">CLP</span><span id="convert-clp" class="money-value" style="font-size: 13px; font-weight: 700; display:block;">96.050</span></div>
+          <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px;"><span style="color: var(--blue); font-size: 11px; font-weight: 700;">EUR</span><span id="convert-eur" class="money-value" style="font-size: 13px; font-weight: 700; display:block;">86,00</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="go('preview')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+        <span style="font-size: 12px; flex: 1;" data-en="Pre-trip expenses (flights, hotel, insurance)">Gastos pre-viaje (vuelos, hotel, seguro)</span>
+        <span id="pres-preview-total" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 950</span>
+      </div>
+
+      <div class="card" style="border-color: var(--blue); padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="go('compartidos')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span style="font-size: 13px; flex: 1; font-weight: 700;" data-en="Shared expenses">Gastos compartidos</span>
+        <span id="pres-esteban-amount" class="money-value" style="color: var(--green); font-size: 13px; font-weight: 700;">US$0</span>
+      </div>
+
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-item" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item active" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+  <!-- ============ GASTOS COMPARTIDOS ============ -->
+  <section class="screen" id="screen-compartidos">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('presupuesto')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 18px;" data-en="SHARED EXPENSES">GASTOS COMPARTIDOS</div>
+    </div>
+    <div style="padding: 6px 20px 0 20px;"><div style="color: var(--text-muted); font-size: 11px;" data-en="With Esteban · separate from your main budget">Con Esteban · aparte de tu presupuesto principal</div></div>
+
+    <div class="scroll">
+      <div class="card" style="border-color: var(--blue); padding: 24px; text-align: center;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" style="margin-bottom: 8px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div id="esteban-label" style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;" data-en="Balance with Esteban">Saldo con Esteban</div>
+        <div id="esteban-amount" class="poster money-value" style="color: var(--text-muted); font-size: 38px; margin-top: 4px;">US$ 0</div>
+        <div id="esteban-clp" class="money-value" style="color: var(--text-dim); font-size: 12px; margin-top: 2px;">≈ $0 CLP</div>
+      </div>
+
+      <div>
+        <div style="color: var(--gold); font-size: 13px; font-weight: 700; margin-bottom: 8px;" data-en="ACCOUNT DETAIL">DETALLE DE LA CUENTA</div>
+        <div id="esteban-detail" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        <div id="compartidos-empty" style="color: var(--text-muted); font-size: 12px; padding: 12px 0; text-align: center;" data-en="No shared expenses logged yet.">Aún no registras gastos compartidos.</div>
+      </div>
+
+      <button onclick="go('nuevocompartido')" style="background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--blue); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add shared expense">+ Agregar gasto compartido</button>
+
+      <button id="settle-btn" onclick="settleEsteban()" style="margin-top: auto; background: var(--gold); color: #05060d; text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer;" data-en="Mark as settled">Marcar como saldado</button>
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-item" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item active" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+
+  <!-- ============ NUEVO GASTO COMPARTIDO ============ -->
+  <section class="screen" id="screen-nuevocompartido">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('compartidos')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 18px;" data-en="SHARED EXPENSE">GASTO COMPARTIDO</div>
+    </div>
+    <div class="scroll">
+      <div class="card" style="padding: 18px; text-align: center;">
+        <label style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;" data-en="Amount (USD)">Monto (USD)</label>
+        <div style="display: flex; align-items: baseline; justify-content: center; gap: 6px; margin-top: 6px;">
+          <span style="color: var(--gold); font-size: 28px; font-weight: 700;">US$</span><input id="comp-amount" type="text" value="0" style="background: none; border: none; font-size: 40px; font-weight: 700; width: 140px; text-align: center;">
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Description">Descripción</label>
+        <input id="comp-desc" type="text" placeholder="Ej: Uber al Javits Center" style="width: 100%; margin-top: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 14px;">
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Trip day (optional)">Día del viaje (opcional)</label>
+        <div id="comp-day-chips" style="display: flex; gap: 8px; margin-top: 8px; overflow-x: auto;">
+          <button class="chip chip-on" data-day="0" onclick="selectChip(this,'comp-day-chips')" data-en="No day">Sin día</button>
+          <button class="chip chip-off" data-day="1" onclick="selectChip(this,'comp-day-chips')"><span data-en="Day">Día</span> 1</button>
+          <button class="chip chip-off" data-day="2" onclick="selectChip(this,'comp-day-chips')"><span data-en="Day">Día</span> 2</button>
+          <button class="chip chip-off" data-day="3" onclick="selectChip(this,'comp-day-chips')"><span data-en="Day">Día</span> 3</button>
+          <button class="chip chip-off" data-day="4" onclick="selectChip(this,'comp-day-chips')"><span data-en="Day">Día</span> 4</button>
+          <button class="chip chip-off" data-day="5" onclick="selectChip(this,'comp-day-chips')"><span data-en="Day">Día</span> 5</button>
+          <button class="chip chip-off" data-day="6" onclick="selectChip(this,'comp-day-chips')"><span data-en="Day">Día</span> 6</button>
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Payment method">Forma de pago</label>
+        <div id="comp-pay-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+          <button class="chip chip-on" style="background: var(--gold); color: #05060d;" onclick="selectChip(this,'comp-pay-chips')">💵 <span data-en="Cash">Efectivo</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-pay-chips')">💳 <span data-en="Credit">Crédito</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-pay-chips')">💳 <span data-en="Debit">Débito</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-pay-chips')">🔄 <span data-en="Transfer">Transferencia</span></button>
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Who paid?">¿Quién pagó?</label>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+          <label id="comp-quien-yo" onclick="selectCompQuien('comp-quien-yo')" style="display: flex; align-items: center; gap: 10px; background: var(--gold); border: 1px solid var(--gold); border-radius: 10px; padding: 10px 12px;">
+            <input type="radio" name="comp-quien" value="yo" checked style="accent-color: #05060d;"><span style="color: #05060d; font-size: 13px; font-weight: 700;" data-en="I paid (50/50 with Esteban)">Yo pagué (50/50 con Esteban)</span>
+          </label>
+          <label id="comp-quien-esteban" onclick="selectCompQuien('comp-quien-esteban')" style="display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;">
+            <input type="radio" name="comp-quien" value="esteban" style="accent-color: var(--blue);"><span style="font-size: 13px;" data-en="Esteban paid for me">Esteban pagó por mí</span>
+          </label>
+        </div>
+      </div>
+      <button onclick="saveCompartido()" style="margin-top: 6px; background: var(--gold); color: #05060d; text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer;" data-en="Save expense">Guardar gasto</button>
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+  </section>
+  <!-- ============ SOUVENIRS ============ -->
+  <section class="screen" id="screen-souvenirs">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 20px;" data-en="SOUVENIRS">SOUVENIRS</div>
+    </div>
+    <div class="scroll">
+      <div class="acc-item open">
+        <div class="acc-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="acc-icon">🌟</div>
+          <div class="acc-title-wrap"><div class="acc-title" data-en="NY exclusive">Exclusivo de NY</div></div>
+          <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="acc-body" id="souv-list-ny">
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en="Vinyl from a NY record store (Rough Trade, Generation Records)">Vinilo de una disquería de NY (Rough Trade, Generation Records)</span></div>
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en="Official NY Comic Con merch (poster, pin, exclusive Funko)">Merch oficial de la NY Comic Con (poster, pin, funko exclusivo)</span></div>
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en="Band t-shirt from a live show">Poleron o camiseta de una banda en un show en vivo</span></div>
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en="A NY bagel to bring back (careful with how you store it!)">Un bagel de NY para traer (ojo con cómo lo guardas)</span></div>
+          <div class="inline-add show"><input id="souv-new-ny" type="text" placeholder="Agregar souvenir..."><button onclick="addSouvItem('souv-list-ny','souv-new-ny')" data-en="Add">Agregar</button></div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="acc-icon">🗽</div>
+          <div class="acc-title-wrap"><div class="acc-title" data-en="Classics">Clásicos</div></div>
+          <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="acc-body" id="souv-list-clasicos">
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en="Empire State / Times Square magnet or postcard">Imán o postal del Empire State / Times Square</span></div>
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en='"I ❤ NY" mug'>Taza "I ❤ NY"</span></div>
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en="American candy (Reese's, NY edition M&M's)">Dulces típicos americanos (Reese's, M&M's edición NY)</span></div>
+          <div class="pack-row"><input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label" data-en="NY university cap or hoodie (NYU, Columbia)">Gorra o polerón de una universidad neoyorkina (NYU, Columbia)</span></div>
+          <div class="inline-add show"><input id="souv-new-clasicos" type="text" placeholder="Agregar souvenir..."><button onclick="addSouvItem('souv-list-clasicos','souv-new-clasicos')" data-en="Add">Agregar</button></div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="acc-icon">🙋</div>
+          <div class="acc-title-wrap"><div class="acc-title" data-en="Requests from family & others">Encargos de familiares y otros</div><div class="acc-badge" id="badge-encargos">0</div></div>
+          <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="acc-body" id="souv-list-encargos">
+          <div id="encargos-empty" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No requests yet — add what people ask for during the trip.">Aún no hay encargos — agrega lo que te vayan pidiendo durante el viaje.</div>
+          <div class="inline-add show" style="flex-wrap: wrap;">
+            <input id="encargo-new-item" type="text" placeholder="Qué le encargaron" style="flex: 2; min-width: 120px;">
+            <input id="encargo-new-quien" type="text" placeholder="Quién lo pidió" style="flex: 1; min-width: 90px;">
+            <button onclick="addEncargo()" data-en="Add">Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-color: var(--gold); padding: 12px 14px;">
+        <div style="color: var(--gold); font-size: 12px; font-weight: 700; margin-bottom: 4px;" data-en="⚠ Customs allowance">⚠ Franquicia aduanera</div>
+        <div style="color: var(--text-muted); font-size: 11px;" data-en="Duty Free purchases at the airport are tax-exempt up to US$675 customs value. Regular souvenir shopping outside Duty Free follows different rules — check aduana.cl before you go overboard.">Las compras en tiendas Duty Free están exentas de impuestos hasta un valor aduanero de US$675. Las compras normales fuera de Duty Free siguen otras reglas — revisa aduana.cl antes de excederte.</div>
+      </div>
+
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-item" onclick="go('home')"><span class="bn-icon">🏠</span>Home</button>
+      <button class="bn-item" onclick="go('prep')"><span class="bn-icon">🎒</span><span data-en="Prep">Prep.</span></button>
+      <button class="bn-item" onclick="go('documentos')"><span class="bn-icon">📎</span><span data-en="Docs">Docs</span></button>
+      <button class="bn-item" onclick="go('panoramas')"><span class="bn-icon">📍</span><span data-en="Spots">Panor.</span></button>
+      <button class="bn-item" onclick="go('itinerario')"><span class="bn-icon">🗓</span><span data-en="Itin.">Itin.</span></button>
+      <button class="bn-item" onclick="go('presupuesto')"><span class="bn-icon">💰</span><span data-en="Budget">Ppto.</span></button>
+      <button class="bn-item" onclick="go('compartidos')"><span class="bn-icon">👥</span><span data-en="Shared">Compart.</span></button>
+      <button class="bn-item active" onclick="go('souvenirs')"><span class="bn-icon">🎁</span><span data-en="Souv.">Souv.</span></button>
+    </div>
+  </section>
+
+  <!-- ============ GASTOS PRE-VIAJE ============ -->
+  <section class="screen" id="screen-preview">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('presupuesto')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 18px;" data-en="PRE-TRIP EXPENSES">GASTOS PRE-VIAJE</div>
+    </div>
+    <div style="padding: 14px 20px 0 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+      <span style="color: var(--text-muted); font-size: 12px;" data-en="Pre-trip total">Total pre-viaje</span>
+      <span id="preview-total" class="money-value" style="font-size: 18px; font-weight: 700;">US$ 950</span>
+    </div>
+    <div class="scroll" id="preview-list">
+      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">✈️</div>
+        <div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;" data-en="Flights Santiago–NY">Vuelos Santiago–NY</div><span class="tag" data-en="💳 Credit">💳 Crédito</span></div>
+        <div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ 600</div></div>
+      </div>
+      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🏨</div>
+        <div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;" data-en="Hotel (4 nights)">Hotel (4 noches)</div><span class="tag" data-en="💳 Debit">💳 Débito</span></div>
+        <div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ 300</div></div>
+      </div>
+      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🛡</div>
+        <div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;" data-en="Travel insurance">Seguro de viaje</div><span class="tag" data-en="🔄 Transfer">🔄 Transferencia</span></div>
+        <div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ 50</div></div>
+      </div>
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+    <button onclick="go('nuevogastoprev')" style="position: absolute; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--gold); border: 2px solid var(--text); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(77,184,255,0.3); cursor: pointer;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </section>
+
+  <!-- ============ NUEVO GASTO PRE-VIAJE ============ -->
+  <section class="screen" id="screen-nuevogastoprev">
+    <div class="header-row">
+      <button class="back-btn" onclick="go('preview')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="poster" style="font-size: 18px;" data-en="PRE-TRIP EXPENSE">GASTO PRE-VIAJE</div>
+    </div>
+    <div class="scroll">
+      <div class="card" style="padding: 18px; text-align: center;">
+        <label style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;" data-en="Amount (USD)">Monto (USD)</label>
+        <div style="display: flex; align-items: baseline; justify-content: center; gap: 6px; margin-top: 6px;">
+          <span style="color: var(--gold); font-size: 28px; font-weight: 700;">US$</span><input id="prev-amount" type="text" value="0" style="background: none; border: none; font-size: 40px; font-weight: 700; width: 140px; text-align: center;">
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Description">Descripción</label>
+        <input id="prev-desc" type="text" placeholder="Ej: Pase de metro semanal" style="width: 100%; margin-top: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 14px;">
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Category">Categoría</label>
+        <div id="prev-cat-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+          <button class="chip chip-on" onclick="selectChip(this,'prev-cat-chips')">✈️ <span data-en="Flights">Vuelos</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">🏨 <span data-en="Hotel">Hotel</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">🛡 <span data-en="Insurance">Seguro</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">🧳 <span data-en="Baggage">Equipaje</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">+ <span data-en="Other">Otra</span></button>
+        </div>
+      </div>
+      <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Payment method">Forma de pago</label>
+        <div id="prev-pay-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+          <button class="chip chip-on" style="background: var(--gold); color: #05060d;" onclick="selectChip(this,'prev-pay-chips')">💵 <span data-en="Cash">Efectivo</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'prev-pay-chips')">💳 <span data-en="Credit">Crédito</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'prev-pay-chips')">💳 <span data-en="Debit">Débito</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'prev-pay-chips')">🔄 <span data-en="Transfer">Transferencia</span></button>
+        </div>
+      </div>
+      <button onclick="savePrevExpense()" style="margin-top: 6px; background: var(--gold); color: #05060d; text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer;" data-en="Save expense">Guardar gasto</button>
+      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  var state = { budget: 1800, spent: 1140, esteban: 0, estebanSettled: false, prevTotal: 950, panoVisited: 2, panoTotal: 16, customDocCount: 0, imprevistoTotal: 65 };
+  var currentLang = 'es';
+  var moneyHidden = false;
+  var STORE_KEY = 'diego_nyc_state_v4';
+  window.__customDocTitles = [];
+  var RATE_CLP = 960.5, RATE_EUR = 0.86;
+
+  function setMoney(el, text){
+    if (!el) return;
+    el.setAttribute('data-real', text);
+    el.textContent = moneyHidden ? '••••' : text;
+  }
+  function toggleMoneyVisibility(){
+    moneyHidden = !moneyHidden;
+    document.querySelectorAll('.money-value').forEach(function(el){
+      if (!el.hasAttribute('data-real')) el.setAttribute('data-real', el.textContent);
+      el.textContent = moneyHidden ? '••••' : el.getAttribute('data-real');
+    });
+    var btn = document.getElementById('eye-btn');
+    if (btn) btn.textContent = moneyHidden ? '🙈' : '👁';
+    saveState();
+  }
+
+  function saveState(){
+    try {
+      var docs = [];
+      document.querySelectorAll('.doc-file-row').forEach(function(r){
+        docs.push({ cat: r.getAttribute('data-cat'), name: r.getAttribute('data-name'), dataUrl: r.getAttribute('data-url'), isImage: r.getAttribute('data-isimg') === '1' });
+      });
+      var pack = {};
+      document.querySelectorAll('#pack-list input[type=checkbox]').forEach(function(cb){
+        pack[cb.parentElement.getAttribute('data-id')] = cb.checked;
+      });
+      var pend = {};
+      document.querySelectorAll('#pend-list input[type=checkbox]').forEach(function(cb){
+        pend[cb.parentElement.getAttribute('data-id')] = cb.checked;
+      });
+      var panoState = {};
+      document.querySelectorAll('.panorama-item[data-id]').forEach(function(p){
+        panoState[p.getAttribute('data-id')] = { visited: p.getAttribute('data-visited'), day: p.querySelector('.pano-day-select') ? p.querySelector('.pano-day-select').value : '0' };
+      });
+      var figuras = [];
+      document.querySelectorAll('#figura-list .pack-row').forEach(function(r){
+        figuras.push({ name: r.querySelector('.pack-label').childNodes[0].textContent.trim(), obtained: r.querySelector('input').checked });
+      });
+      var payload = { state: state, docs: docs, pack: pack, pend: pend, pano: panoState, customDocTitles: window.__customDocTitles, moneyHidden: moneyHidden, figuras: figuras };
+      localStorage.setItem(STORE_KEY, JSON.stringify(payload));
+    } catch(e) { /* almacenamiento no disponible - la app sigue funcionando en memoria */ }
+  }
+  function loadState(){
+    var raw;
+    try { raw = localStorage.getItem(STORE_KEY); } catch(e) { return; }
+    if (!raw) return;
+    var data;
+    try { data = JSON.parse(raw); } catch(e) { return; }
+    if (data.state) Object.assign(state, data.state);
+    if (typeof data.moneyHidden === 'boolean') moneyHidden = data.moneyHidden;
+    if (data.pack) {
+      Object.keys(data.pack).forEach(function(id){
+        var row = document.querySelector('#pack-list .pack-row[data-id="' + id + '"]');
+        if (row && data.pack[id]) { row.querySelector('input').checked = true; row.querySelector('.pack-label').classList.add('checked'); }
+      });
+      updatePackBadge();
+    }
+    if (data.pend) {
+      Object.keys(data.pend).forEach(function(id){
+        var row = document.querySelector('#pend-list .pack-row[data-id="' + id + '"]');
+        if (row && data.pend[id]) { row.querySelector('input').checked = true; row.querySelector('.pack-label').classList.add('checked'); }
+      });
+      updatePendBadge();
+    }
+    if (data.pano) {
+      Object.keys(data.pano).forEach(function(id){
+        var item = document.querySelector('.panorama-item[data-id="' + id + '"]');
+        if (!item) return;
+        if (data.pano[id].visited === 'true' && item.getAttribute('data-visited') !== 'true') { toggleVisit(item, true); }
+        var sel = item.querySelector('.pano-day-select');
+        if (sel && data.pano[id].day) sel.value = data.pano[id].day;
+      });
+    }
+    if (data.customDocTitles && data.customDocTitles.length) {
+      data.customDocTitles.forEach(function(t){ createCustomDocSlot(t, false); });
+      window.__customDocTitles = data.customDocTitles.slice();
+      state.customDocCount = data.customDocTitles.length;
+      if (state.customDocCount >= 4) document.getElementById('btn-add-custom-doc').style.display = 'none';
+    }
+    if (data.docs && data.docs.length) {
+      data.docs.forEach(function(d){ renderDocRow(d.cat, d.name, d.dataUrl, d.isImage); });
+    }
+    if (data.figuras && data.figuras.length) {
+      data.figuras.forEach(function(f){
+        var row = document.createElement('div');
+        row.className = 'pack-row';
+        row.setAttribute('data-id', 'f' + Math.random());
+        row.innerHTML = '<input type="checkbox"' + (f.obtained ? ' checked' : '') + ' onchange="toggleFigura(this)"><span class="pack-label' + (f.obtained ? ' checked' : '') + '">' + f.name + ' <span style="color: ' + (f.obtained ? 'var(--green)' : 'var(--text-dim)') + '; font-size:10px;">' + (f.obtained ? (currentLang === 'en' ? '(obtained ✓)' : '(conseguida ✓)') : (currentLang === 'en' ? '(hoped for)' : '(esperada)')) + '</span></span>';
+        document.getElementById('figura-list').insertBefore(row, document.getElementById('figura-empty'));
+      });
+      if (data.figuras.length) document.getElementById('figura-empty').style.display = 'none';
+    }
+    refreshItineraryPanoramas();
+    updateDocBadge();
+    if (moneyHidden) {
+      document.querySelectorAll('.money-value').forEach(function(el){
+        if (!el.hasAttribute('data-real')) el.setAttribute('data-real', el.textContent);
+        el.textContent = '••••';
+      });
+      var btn = document.getElementById('eye-btn');
+      if (btn) btn.textContent = '🙈';
+    }
+  }
+
+  function go(name) {
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('screen-' + name).classList.add('active');
+    var scrollEl = document.querySelector('#screen-' + name + ' .scroll');
+    if (scrollEl) scrollEl.scrollTop = 0;
+  }
+  function preselectDay(day){
+    var chip = document.querySelector('#gasto-day-chips .chip[data-day="' + day + '"]');
+    if (chip) selectChip(chip, 'gasto-day-chips');
+  }
+  function toggleAcc(id){ document.getElementById(id).classList.toggle('open'); }
+  function toggleDay(day){ document.getElementById('day-acc-' + day).classList.toggle('open'); }
+  function openDay(day){
+    document.querySelectorAll('.day-acc').forEach(function(d){ d.classList.remove('open'); });
+    document.getElementById('day-acc-' + day).classList.add('open');
+  }
+  function selectChip(btn, groupId) {
+    document.querySelectorAll('#' + groupId + ' .chip').forEach(function(c){
+      c.classList.remove('chip-on'); c.classList.add('chip-off');
+      c.style.background = ''; c.style.color = '';
+    });
+    btn.classList.remove('chip-off'); btn.classList.add('chip-on');
+  }
+
+  function addFigura(){
+    var input = document.getElementById('figura-new-item');
+    var name = input.value.trim();
+    if (!name) return;
+    var row = document.createElement('div');
+    row.className = 'pack-row';
+    row.setAttribute('data-id', 'f' + Date.now());
+    row.innerHTML = '<input type="checkbox" onchange="toggleFigura(this)"><span class="pack-label">' + name + ' <span style="color: var(--text-dim); font-size:10px;" data-en="(hoped for)">(esperada)</span></span>';
+    document.getElementById('figura-list').insertBefore(row, document.getElementById('figura-empty'));
+    document.getElementById('figura-empty').style.display = 'none';
+    input.value = '';
+    saveState();
+  }
+  function toggleFigura(cb){
+    var label = cb.parentElement.querySelector('.pack-label');
+    var tag = label.querySelector('span');
+    if (cb.checked) {
+      label.classList.add('checked');
+      if (tag) { tag.textContent = currentLang === 'en' ? '(obtained ✓)' : '(conseguida ✓)'; tag.style.color = 'var(--green)'; }
+    } else {
+      label.classList.remove('checked');
+      if (tag) { tag.textContent = currentLang === 'en' ? '(hoped for)' : '(esperada)'; tag.style.color = 'var(--text-dim)'; }
+    }
+    saveState();
+  }
+
+  function togglePack(cb){
+    var label = cb.parentElement.querySelector('.pack-label');
+    label.classList.toggle('checked', cb.checked);
+    updatePackBadge(); checkMilestones(); saveState();
+  }
+  function updatePackBadge(){
+    var total = document.querySelectorAll('#pack-list .pack-row').length;
+    var checked = document.querySelectorAll('#pack-list .pack-row input:checked').length;
+    document.getElementById('badge-equipaje').textContent = checked + '/' + total + ' ' + (currentLang === 'en' ? 'ready' : 'listo');
+  }
+  function addPack(){
+    var input = document.getElementById('pack-new-item');
+    var name = input.value.trim();
+    if (!name) return;
+    var row = document.createElement('div');
+    row.className = 'pack-row';
+    row.setAttribute('data-id', 'k' + Date.now());
+    row.innerHTML = '<input type="checkbox" onchange="togglePack(this)"><span class="pack-label">' + name + '</span>';
+    document.getElementById('pack-list').insertBefore(row, document.getElementById('pack-list').lastElementChild);
+    input.value = ''; updatePackBadge(); saveState();
+  }
+
+  function togglePend(cb){
+    var label = cb.parentElement.querySelector('.pack-label');
+    label.classList.toggle('checked', cb.checked);
+    updatePendBadge(); checkMilestones(); saveState();
+  }
+  function updatePendBadge(){
+    var total = document.querySelectorAll('#pend-list .pack-row').length;
+    var checked = document.querySelectorAll('#pend-list .pack-row input:checked').length;
+    document.getElementById('badge-pendientes').textContent = checked + '/' + total + ' ' + (currentLang === 'en' ? 'ready' : 'listo');
+  }
+  function addPend(){
+    var input = document.getElementById('pend-new-item');
+    var name = input.value.trim();
+    if (!name) return;
+    var row = document.createElement('div');
+    row.className = 'pack-row';
+    row.setAttribute('data-id', 'd' + Date.now());
+    row.innerHTML = '<input type="checkbox" onchange="togglePend(this)"><span class="pack-label">' + name + '</span>';
+    document.getElementById('pend-list').insertBefore(row, document.getElementById('pend-list').lastElementChild);
+    input.value = ''; updatePendBadge(); saveState();
+  }
+
+  function toggleSouv(cb){
+    var label = cb.parentElement.querySelector('.pack-label');
+    label.classList.toggle('checked', cb.checked);
+    checkMilestones();
+  }
+  function addSouvItem(listId, inputId){
+    var input = document.getElementById(inputId);
+    var name = input.value.trim();
+    if (!name) return;
+    var row = document.createElement('div');
+    row.className = 'pack-row';
+    row.innerHTML = '<input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label">' + name + '</span>';
+    var list = document.getElementById(listId);
+    list.insertBefore(row, list.lastElementChild);
+    input.value = '';
+  }
+  function addEncargo(){
+    var itemInput = document.getElementById('encargo-new-item');
+    var quienInput = document.getElementById('encargo-new-quien');
+    var item = itemInput.value.trim();
+    var quien = quienInput.value.trim();
+    if (!item) return;
+    document.getElementById('encargos-empty').style.display = 'none';
+    var row = document.createElement('div');
+    row.className = 'pack-row';
+    row.innerHTML = '<input type="checkbox" onchange="toggleSouv(this)"><span class="pack-label">' + item + (quien ? ' <span style="color:var(--blue);font-size:11px;">(' + (currentLang === 'en' ? 'for ' : 'para ') + quien + ')</span>' : '') + '</span>';
+    var list = document.getElementById('souv-list-encargos');
+    list.insertBefore(row, list.lastElementChild);
+    itemInput.value = ''; quienInput.value = '';
+    var count = document.querySelectorAll('#souv-list-encargos .pack-row').length;
+    document.getElementById('badge-encargos').textContent = count;
+  }
+
+  function renderDocRow(cat, name, dataUrl, isImage){
+    var container = document.querySelector('.doc-files[data-cat="' + cat + '"]');
+    if (!container) return;
+    var row = document.createElement('div');
+    row.className = 'doc-file-row';
+    row.setAttribute('data-cat', cat); row.setAttribute('data-name', name); row.setAttribute('data-url', dataUrl); row.setAttribute('data-isimg', isImage ? '1' : '0');
+    row.innerHTML = (isImage ? '<img class="doc-thumb" src="' + dataUrl + '">' : '<div class="doc-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;">📄</div>') +
+      '<span style="font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + name + '</span>';
+    container.appendChild(row);
+  }
+  function addDocument(input, cat){
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    var isImage = file.type.indexOf('image') === 0;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      renderDocRow(cat, file.name, e.target.result, isImage);
+      updateDocBadge(); checkMilestones(); saveState();
+    };
+    reader.readAsDataURL(file);
+  }
+  function updateDocBadge(){
+    var count = document.querySelectorAll('.doc-file-row').length;
+    var el = document.getElementById('badge-documentos');
+    if (el) el.innerHTML = count + ' ' + (currentLang === 'en' ? 'files loaded' : 'archivos cargados');
+  }
+  function promptCustomDoc(){
+    if (state.customDocCount >= 4) return;
+    document.getElementById('custom-add-row').classList.add('show');
+  }
+  function confirmCustomDoc(){
+    var input = document.getElementById('custom-doc-title');
+    var title = input.value.trim();
+    if (!title) return;
+    createCustomDocSlot(title, true);
+    input.value = ''; document.getElementById('custom-add-row').classList.remove('show');
+  }
+  function createCustomDocSlot(title, persist){
+    var idx = window.__customDocTitles.indexOf(title);
+    var catId = 'custom' + (idx >= 0 ? idx : window.__customDocTitles.length);
+    if (persist) window.__customDocTitles.push(title);
+    state.customDocCount = window.__customDocTitles.length;
+    var card = document.createElement('div');
+    card.className = 'card'; card.style.cssText = 'padding: 14px 16px;'; card.setAttribute('data-cat', catId);
+    card.innerHTML =
+      '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+        '<span style="color: var(--gold); font-size: 13px; font-weight: 700;">📌 ' + title + '</span>' +
+        '<label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;">+ Subir<input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,\'' + catId + '\')"></label>' +
+      '</div><div class="doc-files" data-cat="' + catId + '"></div>';
+    document.getElementById('custom-doc-slots').appendChild(card);
+    if (state.customDocCount >= 4) document.getElementById('btn-add-custom-doc').style.display = 'none';
+    if (persist) saveState();
+  }
+
+  function toggleVisit(card, silent) {
+    var circle = card.querySelector('.check-circle');
+    var name = card.querySelector('.p-name');
+    var visited = card.getAttribute('data-visited') === 'true';
+    if (!visited) {
+      circle.style.background = 'var(--green)'; circle.style.border = 'none';
+      circle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3" style="margin:6px;"><path d="m5 12 5 5L20 7"/></svg>';
+      name.style.textDecoration = 'line-through'; card.style.opacity = '0.75';
+      card.setAttribute('data-visited', 'true'); state.panoVisited++;
+    } else {
+      circle.style.background = 'transparent'; circle.style.border = '2px solid #2a3654';
+      circle.innerHTML = ''; name.style.textDecoration = 'none'; card.style.opacity = '1';
+      card.setAttribute('data-visited', 'false'); state.panoVisited--;
+    }
+    updatePanoCount(); checkMilestones();
+    if (!silent) saveState();
+  }
+  function updatePanoCount(){
+    var el = document.getElementById('badge-panoramas');
+    if (el) el.innerHTML = state.panoVisited + '/' + state.panoTotal + ' ' + (currentLang === 'en' ? 'visited' : 'visitados');
+  }
+  function filterPanoramas(btn, cat){
+    document.querySelectorAll('#panorama-filter-chips .chip').forEach(function(c){ c.classList.remove('chip-on'); c.classList.add('chip-off'); });
+    btn.classList.remove('chip-off'); btn.classList.add('chip-on');
+    document.querySelectorAll('#panorama-list .panorama-item').forEach(function(item){
+      var show = (cat === 'all') || item.getAttribute('data-cat') === cat;
+      item.style.display = show ? 'block' : 'none';
+    });
+  }
+  function addPanorama(){
+    var nameInput = document.getElementById('panorama-new-name');
+    var name = nameInput.value.trim();
+    if (!name) return;
+    var id = 'p' + Date.now();
+    var row = document.createElement('div');
+    row.className = 'card panorama-item'; row.setAttribute('data-id', id); row.setAttribute('data-cat', 'clasico'); row.setAttribute('data-visited', 'false');
+    row.style.cssText = 'padding: 12px 14px;';
+    row.innerHTML =
+      '<div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">' +
+      '<div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>' +
+      '<div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">' + name + '</div>' +
+      '<span style="color: var(--text-muted); font-size: 10px;">' + (currentLang === 'en' ? 'Added by you' : 'Agregado por ti') + '</span></div></div>' +
+      '<div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>';
+    var list = document.getElementById('panorama-list');
+    list.insertBefore(row, document.getElementById('panorama-add-row'));
+    state.panoTotal++; updatePanoCount();
+    nameInput.value = ''; document.getElementById('panorama-add-row').classList.remove('show');
+    addMapsLinksToPanoramas(); saveState();
+  }
+  function setPanoDay(sel){ refreshItineraryPanoramas(); saveState(); }
+  function refreshItineraryPanoramas(){
+    for (var d = 1; d <= 6; d++) {
+      var container = document.getElementById('day-panoramas-' + d);
+      if (container) container.innerHTML = '';
+    }
+    document.querySelectorAll('.panorama-item[data-id]').forEach(function(item){
+      var sel = item.querySelector('.pano-day-select');
+      if (!sel) return;
+      var day = parseInt(sel.value, 10);
+      if (!day) return;
+      var container = document.getElementById('day-panoramas-' + day);
+      if (!container) return;
+      var name = item.querySelector('.p-name').textContent;
+      var pill = document.createElement('div');
+      pill.style.cssText = 'display:inline-flex; align-items:center; gap:4px; background: var(--blue-bg); border: 1px solid #1e4a6a; color: var(--blue); font-size: 11px; padding: 4px 9px; border-radius: 12px; margin: 0 6px 6px 0;';
+      pill.textContent = '📍 ' + name;
+      container.appendChild(pill);
+    });
+  }
+  function addMapsLinksToPanoramas(){
+    document.querySelectorAll('.panorama-item').forEach(function(item){
+      if (item.querySelector('.maps-link')) return;
+      var nameEl = item.querySelector('.p-name');
+      if (!nameEl) return;
+      var name = nameEl.textContent;
+      var a = document.createElement('a');
+      a.className = 'maps-link';
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name + ' New York');
+      a.target = '_blank'; a.rel = 'noopener';
+      a.style.cssText = 'display:inline-block; margin-top:8px; margin-left:8px; color: var(--blue); font-size: 11px; font-weight: 700;';
+      a.textContent = '📍 Abrir en Maps';
+      a.onclick = function(e){ e.stopPropagation(); };
+      var selectWrap = item.querySelector('.pano-day-select');
+      if (selectWrap && selectWrap.parentElement) selectWrap.parentElement.appendChild(a);
+    });
+  }
+
+  function renderItinerario(){
+    for (var d = 1; d <= 6; d++) {
+      var subtotal = 0;
+      var container = document.querySelector('.day-expenses[data-day="' + d + '"]');
+      var empty = document.getElementById('day-empty-' + d);
+      if (!container) continue;
+      var anyExpense = container.children.length > 0;
+      container.querySelectorAll('.expense-row').forEach(function(row){ subtotal += parseFloat(row.getAttribute('data-amount')) || 0; });
+      setMoney(document.getElementById('day-subtotal-' + d), 'US$ ' + subtotal.toLocaleString('es-CL'));
+      if (empty) empty.style.display = anyExpense ? 'none' : 'block';
+    }
+  }
+
+  var TAGS = {
+    imprevisto: {es:'⚡ Imprevisto', en:'⚡ Unplanned'},
+    propina: {es:'Incl. propina', en:'Tip incl.'},
+    compartido: {es:'🤝 Compartido c/Esteban', en:'🤝 Shared w/ Esteban'},
+    pagoEsteban: {es:'🤝 Pagado por Esteban', en:'🤝 Paid by Esteban'}
+  };
+  function selectQuien(id){
+    ['quien-solo','quien-comp1','quien-comp2'].forEach(function(lid){
+      var el = document.getElementById(lid);
+      var span = el.querySelector('span');
+      if (lid === id) {
+        if (id === 'quien-solo') { el.style.background = 'var(--gold)'; el.style.borderColor = 'var(--gold)'; span.style.color = '#05060d'; }
+        else { el.style.background = 'var(--blue-bg)'; el.style.borderColor = 'var(--blue)'; span.style.color = '#dbeaff'; }
+      } else { el.style.background = 'var(--card)'; el.style.borderColor = 'var(--border)'; span.style.color = 'var(--text)'; }
+    });
+  }
+  function selectCompQuien(id){
+    ['comp-quien-yo','comp-quien-esteban'].forEach(function(lid){
+      var el = document.getElementById(lid);
+      var span = el.querySelector('span');
+      if (lid === id) {
+        if (id === 'comp-quien-yo') { el.style.background = 'var(--gold)'; el.style.borderColor = 'var(--gold)'; span.style.color = '#05060d'; }
+        else { el.style.background = 'var(--blue-bg)'; el.style.borderColor = 'var(--blue)'; span.style.color = '#dbeaff'; }
+      } else { el.style.background = 'var(--card)'; el.style.borderColor = 'var(--border)'; span.style.color = 'var(--text)'; }
+    });
+  }
+  function mapPayCode(label){
+    if (/Efectivo|Cash/i.test(label)) return 'efectivo';
+    if (/Crédito|Credit/i.test(label)) return 'credito';
+    if (/Débito|Debit/i.test(label)) return 'debito';
+    if (/Transferencia|Transfer/i.test(label)) return 'transferencia';
+    return 'efectivo';
+  }
+  function saveMainExpense(){
+    var amount = parseFloat(document.getElementById('gasto-amount').value) || 0;
+    var desc = document.getElementById('gasto-desc').value.trim();
+    var dayBtn = document.querySelector('#gasto-day-chips .chip-on');
+    var day = dayBtn ? parseInt(dayBtn.getAttribute('data-day'), 10) : 3;
+    var catBtn = document.querySelector('#gasto-cat-chips .chip-on');
+    var payBtn = document.querySelector('#gasto-pay-chips .chip-on');
+    var catLabel = catBtn ? catBtn.textContent.trim() : '';
+    var payLabel = payBtn ? payBtn.textContent.trim() : '';
+    if (!desc) desc = catLabel.replace(/^[^\s]+\s/, '') || (currentLang === 'en' ? 'Expense' : 'Gasto');
+    var quienEl = document.querySelector('input[name="quien"]:checked');
+    var quienVal = quienEl ? quienEl.value : 'solo';
+    var imprevisto = document.getElementById('chk-imprevisto').checked;
+    var propina = document.getElementById('chk-propina').checked;
+
+    var tagsHtml = '<span class="tag">' + payLabel + '</span>';
+    if (imprevisto) tagsHtml += '<span class="tag tag-gold">' + TAGS.imprevisto[currentLang] + '</span>';
+    if (propina) tagsHtml += '<span class="tag tag-green">' + TAGS.propina[currentLang] + '</span>';
+    if (quienVal === 'comp1') tagsHtml += '<span class="tag tag-blue">' + TAGS.compartido[currentLang] + '</span>';
+    if (quienVal === 'comp2') tagsHtml += '<span class="tag tag-blue">' + TAGS.pagoEsteban[currentLang] + '</span>';
+
+    var row = document.createElement('div');
+    row.className = 'card expense-row';
+    row.setAttribute('data-day', day); row.setAttribute('data-amount', amount); row.setAttribute('data-pay', mapPayCode(payLabel));
+    row.setAttribute('data-imprevisto', imprevisto ? 1 : 0); row.setAttribute('data-quien', quienVal);
+    row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px;';
+    row.innerHTML =
+      '<div style="width: 38px; height: 38px; border-radius: 10px; background: var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></div>' +
+      '<div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;">' + desc + '</div><div style="margin-top: 4px;">' + tagsHtml + '</div></div>' +
+      '<div style="display: flex; align-items: center; gap: 6px;">' +
+        '<button onclick="startEditAmount(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;" title="Editar monto">✎</button>' +
+        '<div class="money-value" style="font-size: 14px; font-weight: 700;">US$ ' + amount.toLocaleString('es-CL') + '</div>' +
+        '<button onclick="deleteExpenseRow(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;" title="Eliminar">🗑</button>' +
+      '</div>';
+
+    var container = document.querySelector('.day-expenses[data-day="' + day + '"]');
+    container.appendChild(row);
+    if (moneyHidden) { var mv = row.querySelector('.money-value'); mv.setAttribute('data-real', mv.textContent); mv.textContent = '••••'; }
+
+    state.spent += amount;
+    if (imprevisto) state.imprevistoTotal += amount;
+    if (quienVal === 'comp1') state.esteban += amount / 2;
+    if (quienVal === 'comp2') state.esteban -= amount;
+
+    updateBudgetDisplays(); updateEstebanDisplay(); computePaymentTotals(); renderItinerario(); renderRadar(); checkMilestones();
+    document.getElementById('gasto-amount').value = '0'; document.getElementById('gasto-desc').value = '';
+    go('itinerario'); openDay(day); saveState();
+  }
+
+  function savePrevExpense() {
+    var amount = parseFloat(document.getElementById('prev-amount').value) || 0;
+    var desc = document.getElementById('prev-desc').value.trim() || (currentLang === 'en' ? 'Pre-trip expense' : 'Gasto pre-viaje');
+    var catBtn = document.querySelector('#prev-cat-chips .chip-on');
+    var payBtn = document.querySelector('#prev-pay-chips .chip-on');
+    var catLabel = catBtn ? catBtn.textContent.trim() : '';
+    var payLabel = payBtn ? payBtn.textContent.trim() : '';
+    var row = document.createElement('div');
+    row.className = 'card'; row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 12px;';
+    row.innerHTML =
+      '<div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">📌</div>' +
+      '<div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;">' + desc + '</div>' +
+      '<span class="tag">' + payLabel + '</span><span class="tag" style="margin-left:4px;">' + catLabel + '</span></div>' +
+      '<div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ ' + amount.toLocaleString('es-CL') + '</div></div>';
+    var list = document.getElementById('preview-list');
+    list.insertBefore(row, list.querySelector('.footer-credit'));
+    state.prevTotal += amount;
+    setMoney(document.getElementById('preview-total'), 'US$ ' + state.prevTotal.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pres-preview-total'), 'US$ ' + state.prevTotal.toLocaleString('es-CL'));
+    document.getElementById('prev-amount').value = '0'; document.getElementById('prev-desc').value = '';
+    go('preview'); saveState();
+  }
+
+  function saveCompartido(){
+    var amount = parseFloat(document.getElementById('comp-amount').value) || 0;
+    var desc = document.getElementById('comp-desc').value.trim() || (currentLang === 'en' ? 'Shared expense' : 'Gasto compartido');
+    var dayBtn = document.querySelector('#comp-day-chips .chip-on');
+    var day = dayBtn ? parseInt(dayBtn.getAttribute('data-day'), 10) : 0;
+    var payBtn = document.querySelector('#comp-pay-chips .chip-on');
+    var payLabel = payBtn ? payBtn.textContent.trim() : '';
+    var whoEl = document.querySelector('input[name="comp-quien"]:checked');
+    var who = whoEl ? whoEl.value : 'yo';
+
+    var dayText = day ? ((currentLang === 'en' ? 'Day ' : 'Día ') + day + ' · ') : '';
+    var whoText = who === 'yo' ? (currentLang === 'en' ? 'you paid, 50/50' : 'pagaste tú, 50/50') : (currentLang === 'en' ? 'Esteban paid for you' : 'Esteban pagó por ti');
+    var sign = who === 'yo' ? '+' : '-';
+    var displayAmt = who === 'yo' ? (amount / 2) : amount;
+
+    var row = document.createElement('div');
+    row.className = 'card'; row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 10px;';
+    row.innerHTML =
+      '<div style="flex: 1;"><div style="font-size: 13px; font-weight: 600;">' + desc + '</div><div style="color: var(--text-muted); font-size: 11px;">' + dayText + whoText + ' · ' + payLabel + '</div></div>' +
+      '<span class="money-value" style="color: ' + (who === 'yo' ? 'var(--green)' : 'var(--orange)') + '; font-size: 13px; font-weight: 700;">' + sign + 'US$ ' + displayAmt.toLocaleString('es-CL') + '</span>';
+    document.getElementById('esteban-detail').appendChild(row);
+    document.getElementById('compartidos-empty').style.display = 'none';
+
+    if (who === 'yo') state.esteban += amount / 2; else state.esteban -= amount;
+    updateEstebanDisplay();
+    document.getElementById('comp-amount').value = '0'; document.getElementById('comp-desc').value = '';
+    go('compartidos'); saveState();
+  }
+
+  function editBudget(){
+    document.getElementById('budget-usd-value').value = state.budget;
+    document.getElementById('budget-clp-value').value = Math.round(state.budget * RATE_CLP);
+    document.getElementById('budget-edit-row').classList.add('show');
+  }
+  function syncBudgetFromUsd(){
+    var usd = parseFloat(document.getElementById('budget-usd-value').value) || 0;
+    document.getElementById('budget-clp-value').value = Math.round(usd * RATE_CLP);
+  }
+  function syncBudgetFromClp(){
+    var clp = parseFloat(document.getElementById('budget-clp-value').value) || 0;
+    document.getElementById('budget-usd-value').value = Math.round(clp / RATE_CLP);
+  }
+  function confirmBudget(){
+    var val = parseFloat(document.getElementById('budget-usd-value').value);
+    if (!val || val <= 0) return;
+    state.budget = val;
+    updateBudgetDisplays();
+    document.getElementById('budget-edit-row').classList.remove('show');
+    saveState();
+  }
+
+  function updateBudgetDisplays(){
+    var pct = Math.max(0, Math.min(100, Math.round((state.spent / state.budget) * 100)));
+    var usedWord = currentLang === 'en' ? 'used' : 'usado';
+    setMoney(document.getElementById('home-avail'), 'US$ ' + (state.budget - state.spent).toLocaleString('es-CL'));
+    setMoney(document.getElementById('pres-budget-amount'), 'US$ ' + state.budget.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pres-budget-clp'), '≈ $' + Math.round(state.budget * RATE_CLP).toLocaleString('es-CL') + ' CLP');
+    setMoney(document.getElementById('pres-spent'), 'US$ ' + state.spent.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pres-avail2'), 'US$ ' + (state.budget - state.spent).toLocaleString('es-CL'));
+    document.getElementById('pres-pct').innerHTML = pct + '% <span data-en="used">' + usedWord + '</span>';
+    document.getElementById('pres-bar').style.width = pct + '%';
+  }
+  function updateEstebanDisplay(){
+    var bal = state.esteban;
+    var owes = bal >= 0;
+    var labelText = bal === 0 ? (currentLang === 'en' ? 'Balance with Esteban' : 'Saldo con Esteban') : (owes ? (currentLang === 'en' ? 'Esteban owes you' : 'Esteban te debe') : (currentLang === 'en' ? 'You owe Esteban' : 'Le debes a Esteban'));
+    document.getElementById('esteban-label').textContent = labelText;
+    setMoney(document.getElementById('esteban-amount'), 'US$ ' + Math.abs(bal).toLocaleString('es-CL'));
+    document.getElementById('esteban-amount').style.color = bal === 0 ? 'var(--text-muted)' : (owes ? 'var(--green)' : 'var(--orange)');
+    setMoney(document.getElementById('esteban-clp'), '≈ $' + Math.round(Math.abs(bal) * RATE_CLP).toLocaleString('es-CL') + ' CLP');
+    var amtText = (bal === 0 ? '' : (owes ? '+' : '-')) + 'US$' + Math.abs(bal).toLocaleString('es-CL');
+    setMoney(document.getElementById('pres-esteban-amount'), amtText);
+    document.getElementById('pres-esteban-amount').style.color = bal === 0 ? 'var(--text-muted)' : (owes ? 'var(--green)' : 'var(--orange)');
+  }
+  function settleEsteban(){
+    state.esteban = 0; state.estebanSettled = true;
+    updateEstebanDisplay();
+    var btn = document.getElementById('settle-btn');
+    btn.textContent = currentLang === 'en' ? '✓ Account settled' : '✓ Cuenta saldada';
+    btn.disabled = true; btn.style.opacity = '0.6'; btn.style.cursor = 'default';
+    document.querySelectorAll('#esteban-detail .card').forEach(function(c){ c.style.opacity = '0.5'; });
+    saveState();
+  }
+
+  function computePaymentTotals(){
+    var totals = {efectivo: 0, credito: 0, debito: 0, transferencia: 0};
+    document.querySelectorAll('.day-expenses .expense-row').forEach(function(row){
+      var code = row.getAttribute('data-pay') || 'efectivo';
+      var amt = parseFloat(row.getAttribute('data-amount')) || 0;
+      totals[code] = (totals[code] || 0) + amt;
+    });
+    setMoney(document.getElementById('pay-total-efectivo'), 'US$ ' + totals.efectivo.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pay-total-credito'), 'US$ ' + totals.credito.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pay-total-debito'), 'US$ ' + totals.debito.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pay-total-transferencia'), 'US$ ' + totals.transferencia.toLocaleString('es-CL'));
+  }
+
+  function recalcConvert(){
+    var usd = parseFloat(document.getElementById('convert-usd').value) || 0;
+    setMoney(document.getElementById('convert-clp'), Math.round(usd * RATE_CLP).toLocaleString('es-CL'));
+    setMoney(document.getElementById('convert-eur'), (usd * RATE_EUR).toLocaleString('es-CL', {minimumFractionDigits:2, maximumFractionDigits:2}));
+  }
+
+  function toggleLang(){
+    currentLang = currentLang === 'es' ? 'en' : 'es';
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      if (!el.hasAttribute('data-es-cache')) el.setAttribute('data-es-cache', el.textContent);
+      el.textContent = currentLang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-es-cache');
+    });
+    document.getElementById('lang-es-label').style.color = currentLang === 'es' ? 'var(--gold)' : '#5a6785';
+    document.getElementById('lang-en-label').style.color = currentLang === 'en' ? 'var(--gold)' : '#5a6785';
+    updateBudgetDisplays(); updatePanoCount(); updatePackBadge(); updatePendBadge(); updateDocBadge(); updateEstebanDisplay();
+  }
+
+  function updateNYTime(){
+    try {
+      var el = document.getElementById('ny-time');
+      if (!el) return;
+      var fmt = new Intl.DateTimeFormat('es-CL', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false });
+      el.textContent = fmt.format(new Date());
+    } catch(e) { /* Intl/timezone no disponible en este entorno */ }
+  }
+
+  function fetchNYWeather(){
+    var el = document.getElementById('ny-temp');
+    if (!el) return;
+    try {
+      var cached = localStorage.getItem('diego_nyc_weather_cache');
+      if (cached) el.textContent = cached;
+    } catch(e) {}
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current=temperature_2m&temperature_unit=celsius')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data && data.current && typeof data.current.temperature_2m === 'number') {
+          var text = Math.round(data.current.temperature_2m) + '°C';
+          el.textContent = text;
+          try { localStorage.setItem('diego_nyc_weather_cache', text); } catch(e) {}
+        }
+      })
+      .catch(function(){ /* sin conexión o bloqueado por el sandbox — se mantiene el último valor cacheado o el placeholder */ });
+  }
+
+  function updateCountdown(){
+    var TRIP_START = new Date('2026-10-07T00:00:00');
+    var now = new Date();
+    var diff = TRIP_START - now;
+    if (diff < 0) diff = 0;
+    document.getElementById('cd-days').textContent = Math.floor(diff / 86400000);
+    document.getElementById('cd-hours').textContent = String(Math.floor((diff / 3600000) % 24)).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(Math.floor((diff / 60000) % 60)).padStart(2, '0');
+  }
+
+  /* ---------- CONSTELACION + NAVE ---------- */
+  function checkMilestones(){
+    var m1 = document.querySelectorAll('#pack-list .pack-row input').length > 0 &&
+      document.querySelectorAll('#pack-list .pack-row input:checked').length === document.querySelectorAll('#pack-list .pack-row input').length;
+    var m2 = document.querySelectorAll('#pend-list .pack-row input').length > 0 &&
+      document.querySelectorAll('#pend-list .pack-row input:checked').length === document.querySelectorAll('#pend-list .pack-row input').length;
+    var m3 = document.querySelectorAll('.doc-file-row').length > 0;
+    var m4 = state.panoVisited >= 3;
+    var m5 = document.querySelectorAll('.expense-row:not(.seed-row)').length > 0;
+    var m6 = document.querySelectorAll('#screen-souvenirs input:checked').length > 0;
+    renderConstellation([m1, m2, m3, m4, m5, m6]);
+  }
+  function renderConstellation(flags){
+    var svg = document.getElementById('constellation-svg');
+    if (!svg) return;
+    var positions = [{x:25,y:55},{x:80,y:20},{x:140,y:50},{x:200,y:18},{x:260,y:48},{x:315,y:22}];
+    var icons = ['🎒','✅','📎','📍','💰','🎁'];
+    var parts = [];
+    for (var i = 0; i < positions.length - 1; i++) {
+      var a = positions[i], b = positions[i+1];
+      var connected = flags[i] && flags[i+1];
+      parts.push('<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="' + (connected ? '#4db8ff' : '#22304d') + '" stroke-width="' + (connected ? 1.4 : 1) + '" stroke-dasharray="' + (connected ? '0' : '3,3') + '" opacity="' + (connected ? 0.85 : 0.4) + '"/>');
+    }
+    var lastDone = -1;
+    for (var j = 0; j < positions.length; j++) {
+      var p = positions[j]; var on = flags[j];
+      if (on) lastDone = j;
+      parts.push('<circle cx="' + p.x + '" cy="' + p.y + '" r="' + (on ? 11 : 9) + '" fill="' + (on ? '#0e2a42' : '#0d1424') + '" stroke="' + (on ? '#e0b83f' : '#22304d') + '" stroke-width="1.6"' + (on ? ' style="filter:drop-shadow(0 0 5px rgba(224,184,63,0.7))"' : '') + '/>');
+      parts.push('<text x="' + p.x + '" y="' + (p.y + 4) + '" text-anchor="middle" font-size="11" opacity="' + (on ? '1' : '0.35') + '">' + icons[j] + '</text>');
+    }
+    if (lastDone >= 0) {
+      var rp = positions[lastDone];
+      var angle = 0;
+      if (lastDone < positions.length - 1) {
+        var np = positions[lastDone + 1];
+        angle = Math.atan2(np.y - rp.y, np.x - rp.x) * 180 / Math.PI + 90;
+      }
+      parts.push('<text x="' + rp.x + '" y="' + (rp.y - 14) + '" text-anchor="middle" font-size="13" transform="rotate(' + angle + ' ' + rp.x + ' ' + (rp.y - 14) + ')" style="filter:drop-shadow(0 0 4px rgba(77,184,255,0.9))">🚀</text>');
+    } else {
+      parts.push('<text x="' + (positions[0].x - 16) + '" y="' + (positions[0].y + 2) + '" text-anchor="middle" font-size="13" opacity="0.6">🚀</text>');
+    }
+    svg.innerHTML = parts.join('');
+  }
+
+  function renderRadar(){
+    var pct = state.spent > 0 ? Math.min(100, Math.round((state.imprevistoTotal / state.spent) * 100)) : 0;
+    var svg = document.getElementById('radar-svg');
+    if (svg) {
+      var circumference = Math.PI * 40;
+      var filled = (pct / 100) * circumference;
+      var color = pct > 30 ? '#ff4d5e' : (pct > 15 ? '#e0b83f' : '#6fe08a');
+      svg.innerHTML =
+        '<path d="M10,55 A40,40 0 0 1 90,55" fill="none" stroke="#1a2440" stroke-width="9" stroke-linecap="round"/>' +
+        '<path d="M10,55 A40,40 0 0 1 90,55" fill="none" stroke="' + color + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + filled + ' ' + circumference + '"' + (pct > 30 ? ' style="filter:drop-shadow(0 0 5px ' + color + ')"' : '') + '/>';
+    }
+    var label = document.getElementById('radar-pct-label');
+    if (label) label.textContent = pct + '%';
+  }
+
+  function startEditAmount(btn){
+    var row = btn.closest('.expense-row');
+    var mv = row.querySelector('.money-value');
+    var current = parseFloat(row.getAttribute('data-amount')) || 0;
+    var input = document.createElement('input');
+    input.type = 'text'; input.value = current;
+    input.style.cssText = 'width:64px; text-align:right; background: var(--bg); border: 1px solid var(--blue); border-radius: 6px; color: var(--text); font-size: 14px; font-weight: 700; padding: 3px 6px;';
+    mv.replaceWith(input);
+    input.focus(); input.select();
+    function commit(){
+      var newVal = parseFloat(input.value) || 0;
+      var delta = newVal - current;
+      row.setAttribute('data-amount', newVal);
+      state.spent += delta;
+      if (row.getAttribute('data-imprevisto') === '1') state.imprevistoTotal += delta;
+      var quien = row.getAttribute('data-quien');
+      if (quien === 'comp1') state.esteban += delta / 2;
+      if (quien === 'comp2') state.esteban -= delta;
+      var newSpan = document.createElement('div');
+      newSpan.className = 'money-value';
+      newSpan.style.cssText = 'font-size: 14px; font-weight: 700;';
+      newSpan.textContent = 'US$ ' + newVal.toLocaleString('es-CL');
+      input.replaceWith(newSpan);
+      updateBudgetDisplays(); updateEstebanDisplay(); computePaymentTotals(); renderItinerario(); renderRadar(); checkMilestones(); saveState();
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') input.blur(); });
+  }
+  function deleteExpenseRow(btn){
+    var row = btn.closest('.expense-row');
+    var amount = parseFloat(row.getAttribute('data-amount')) || 0;
+    state.spent -= amount;
+    if (row.getAttribute('data-imprevisto') === '1') state.imprevistoTotal -= amount;
+    var quien = row.getAttribute('data-quien');
+    if (quien === 'comp1') state.esteban -= amount / 2;
+    if (quien === 'comp2') state.esteban += amount;
+    row.remove();
+    updateBudgetDisplays(); updateEstebanDisplay(); computePaymentTotals(); renderItinerario(); renderRadar(); checkMilestones(); saveState();
+  }
+
+  function seedItinerario(){
+    var seedData = [
+      {desc:'Entrada Comic Con', descEn:'Comic Con ticket', amount:110, pay:'credito', imprevisto:0, tags:['💳 Crédito|💳 Credit']},
+      {desc:'Foto con Hayden Christensen', descEn:'Photo op with Hayden Christensen', amount:65, pay:'efectivo', imprevisto:1, tags:['⚡ Imprevisto|⚡ Unplanned','💵 Efectivo|💵 Cash']},
+      {desc:'Uber al Javits Center', descEn:'Uber to Javits Center', amount:22, pay:'debito', imprevisto:0, tags:['💳 Débito|💳 Debit','🤝 Compartido c/Esteban|🤝 Shared w/ Esteban']},
+      {desc:'Almuerzo food truck', descEn:'Food truck lunch', amount:13, pay:'efectivo', imprevisto:0, tags:['💵 Efectivo|💵 Cash','Incl. propina|Tip incl.']}
+    ];
+    var container = document.querySelector('.day-expenses[data-day="3"]');
+    seedData.forEach(function(item){
+      var tagsHtml = item.tags.map(function(t){
+        var parts = t.split('|'); var cls = 'tag';
+        if (parts[0].indexOf('⚡') === 0) cls = 'tag tag-gold';
+        else if (parts[0].indexOf('🤝') === 0) cls = 'tag tag-blue';
+        else if (parts[0].indexOf('Incl') === 0) cls = 'tag tag-green';
+        return '<span class="' + cls + '" data-en="' + parts[1] + '">' + parts[0] + '</span>';
+      }).join('');
+      var row = document.createElement('div');
+      row.className = 'card expense-row seed-row';
+      row.setAttribute('data-day', '3'); row.setAttribute('data-amount', item.amount); row.setAttribute('data-pay', item.pay);
+      row.setAttribute('data-imprevisto', item.imprevisto); row.setAttribute('data-quien', 'solo');
+      row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px;';
+      row.innerHTML =
+        '<div style="width: 38px; height: 38px; border-radius: 10px; background: var(--red); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M4 20V6a2 2 0 0 1 2-2h6l8 8v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/></svg></div>' +
+        '<div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;" data-en="' + item.descEn + '">' + item.desc + '</div>' +
+        '<div style="margin-top: 4px;">' + tagsHtml + '</div></div>' +
+        '<div style="display: flex; align-items: center; gap: 6px;">' +
+          '<button onclick="startEditAmount(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;" title="Editar monto">✎</button>' +
+          '<div class="money-value" style="font-size: 14px; font-weight: 700;">US$ ' + item.amount.toLocaleString('es-CL') + '</div>' +
+          '<button onclick="deleteExpenseRow(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;" title="Eliminar">🗑</button>' +
+        '</div>';
+      container.appendChild(row);
+    });
+  }
+
+  seedItinerario();
+  updatePackBadge();
+  updatePendBadge();
+  updatePanoCount();
+  updateDocBadge();
+  updateBudgetDisplays();
+  updateEstebanDisplay();
+  computePaymentTotals();
+  renderItinerario();
+  refreshItineraryPanoramas();
+  addMapsLinksToPanoramas();
+  renderRadar();
+  checkMilestones();
+  recalcConvert();
+  /* ---------- SERVICE WORKER Y AVISO DE ACTUALIZACION ---------- */
+  function initServiceWorker(){
+    if (!('serviceWorker' in navigator)) return;
+    try {
+      navigator.serviceWorker.register('./sw.js').then(function(reg){
+        if (reg.waiting) showUpdateBanner(reg);
+        reg.addEventListener('updatefound', function(){
+          var installing = reg.installing;
+          if (!installing) return;
+          installing.addEventListener('statechange', function(){
+            if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateBanner(reg);
+            }
+          });
+        });
+      }).catch(function(){ /* no disponible en este entorno (ej. vista previa) */ });
+
+      var refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function(){
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    } catch(e) {}
+  }
+  function showUpdateBanner(reg){
+    var banner = document.getElementById('update-banner');
+    banner.style.display = 'flex';
+    document.getElementById('update-banner-btn').onclick = function(){
+      if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    };
+  }
+  initServiceWorker();
+
+  updateCountdown();
+  setInterval(updateCountdown, 30000);
+  updateNYTime();
+  setInterval(updateNYTime, 30000);
+  fetchNYWeather();
+  setInterval(fetchNYWeather, 15 * 60000);
+  loadState();
+  updateBudgetDisplays();
+  updateEstebanDisplay();
+  computePaymentTotals();
+  renderItinerario();
+  renderRadar();
+  checkMilestones();
+</script>
+</body>
+</html>
