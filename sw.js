@@ -1,7 +1,7 @@
 // Diego NYC Oct '26 — Service Worker
 // Sube este número cada vez que modifiques la app (index.html, manifest, íconos, etc.)
 // para que el navegador detecte la nueva versión y el banner de "Actualización disponible" aparezca.
-const SW_VERSION = 'v1.2.0';
+const SW_VERSION = 'v2.0.0';
 const CACHE_NAME = 'diego-nyc-' + SW_VERSION;
 
 const CORE_ASSETS = [
