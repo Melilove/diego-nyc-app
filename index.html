@@ -4,10 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Diego NYC Oct '26</title>
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#05060d">
-<link rel="icon" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -130,6 +126,8 @@
   <button id="update-banner-btn" style="background:#05060d; color:#e0b83f; border:none; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;" data-en="Update now">Actualizar ahora</button>
 </div>
 
+<div id="toast" style="display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:9999; background:#ff4d5e; color:#fff; font-family:'Barlow',sans-serif; font-size:13px; font-weight:600; padding:10px 18px; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.4); max-width:90%; text-align:center;"></div>
+
 <div id="phone">
 
   <!-- ============ HOME (simplificado) ============ -->
@@ -181,7 +179,16 @@
         <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--blue-bg); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">💰</div>
         <div style="flex: 1;">
           <div style="font-size: 13px; font-weight: 700;" data-en="Budget">Presupuesto</div>
-          <div style="color: var(--text-muted); font-size: 11px;"><span id="home-avail" class="money-value" style="color: var(--green); font-weight: 700;">US$ 660</span> <span data-en="available">disponible</span></div>
+          <div id="home-balances-line" style="color: var(--text-muted); font-size: 11px;">💵 <span id="home-bal-efectivo" class="money-value">US$ 0</span> · 💳cr <span id="home-bal-credito" class="money-value">US$ 0</span> · 💳db <span id="home-bal-debito" class="money-value">US$ 0</span></div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+
+      <div class="quick-card" style="border-color: var(--gold);" onclick="go('nuevogasto')">
+        <div style="width: 42px; height: 42px; border-radius: 10px; background: #2a2008; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">📝</div>
+        <div style="flex: 1;">
+          <div style="font-size: 13px; font-weight: 700;" data-en="Log expense">Registro de gasto</div>
+          <div style="color: var(--text-muted); font-size: 11px;" data-en="Amount, payment method, date — quick entry">Monto, forma de pago, fecha — registro rápido</div>
         </div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
       </div>
@@ -196,6 +203,9 @@
       </div>
 
       <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
+      <div style="text-align: center; margin-top: 4px;">
+        <button id="reset-app-btn" onclick="handleResetClick()" type="button" style="background:none; border:none; color: var(--text-dim); font-size: 10px; text-decoration: underline; cursor:pointer; padding: 6px;" data-en="🗑 Reset all app data">🗑 Reiniciar todos los datos de la app</button>
+      </div>
     </div>
 
     <div class="bottom-nav" id="nav-home">
@@ -317,34 +327,35 @@
       <div class="card" style="padding: 14px 16px;" data-cat="ida">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="color: var(--gold); font-size: 13px; font-weight: 700;">✈️ <span data-en="Outbound ticket">Ticket de ida</span></span>
-          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'ida')"></label>
+          <button type="button" onclick="document.getElementById('doc-file-ida').click()" style="background: var(--border); border: none; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span></button><input type="file" id="doc-file-ida" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'ida')">
         </div>
         <div class="doc-files" data-cat="ida"></div>
       </div>
       <div class="card" style="padding: 14px 16px;" data-cat="vuelta">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="color: var(--gold); font-size: 13px; font-weight: 700;">🛬 <span data-en="Return ticket">Ticket de vuelta</span></span>
-          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'vuelta')"></label>
+          <button type="button" onclick="document.getElementById('doc-file-vuelta').click()" style="background: var(--border); border: none; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span></button><input type="file" id="doc-file-vuelta" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'vuelta')">
         </div>
         <div class="doc-files" data-cat="vuelta"></div>
       </div>
       <div class="card" style="padding: 14px 16px;" data-cat="seguro">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="color: var(--gold); font-size: 13px; font-weight: 700;">🛡 <span data-en="Travel insurance">Seguro de viaje</span></span>
-          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'seguro')"></label>
+          <button type="button" onclick="document.getElementById('doc-file-seguro').click()" style="background: var(--border); border: none; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span></button><input type="file" id="doc-file-seguro" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'seguro')">
         </div>
         <div class="doc-files" data-cat="seguro"></div>
       </div>
       <div class="card" style="padding: 14px 16px;" data-cat="hospedaje">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="color: var(--gold); font-size: 13px; font-weight: 700;">🏨 <span data-en="Lodging">Hospedaje</span></span>
-          <label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span><input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'hospedaje')"></label>
+          <button type="button" onclick="document.getElementById('doc-file-hospedaje').click()" style="background: var(--border); border: none; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;"><span data-en="+ Upload">+ Subir</span></button><input type="file" id="doc-file-hospedaje" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,'hospedaje')">
         </div>
         <div class="doc-files" data-cat="hospedaje"></div>
       </div>
 
       <div id="custom-doc-slots"></div>
-      <button id="btn-add-custom-doc" onclick="promptCustomDoc()" style="background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--blue); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add additional document (up to 4)">+ Agregar documento adicional (hasta 4)</button>
+      <button id="btn-add-custom-doc" onclick="promptCustomDoc()" style="background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--blue); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add additional document (up to 6)">+ Agregar documento adicional (hasta 6)</button>
+      <div style="color: var(--text-dim); font-size: 10px; text-align: center;" data-en="Max. 3 MB per file">Máx. 3 MB por archivo</div>
       <div id="custom-add-row" class="inline-add">
         <input id="custom-doc-title" type="text" placeholder="Nombre del documento">
         <button onclick="confirmCustomDoc()" data-en="Add">Agregar</button>
@@ -382,18 +393,18 @@
     </div>
 
     <div class="scroll" id="panorama-list">
-      <div class="card panorama-item" data-id="p1" data-cat="clasico" data-visited="true" style="border-color: var(--green); padding: 12px 14px; opacity: 0.75;">
+      <div class="card panorama-item" data-id="p1" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
         <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
-          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></div>
-          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700; text-decoration: line-through;">Times Square</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Broadway & W 42-47th St, Manhattan</div></div>
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Times Square</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Broadway & W 42-47th St, Manhattan</div></div>
         </div>
-        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1" selected>Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
       </div>
 
-      <div class="card panorama-item" data-id="p2" data-cat="clasico" data-visited="true" style="border-color: var(--green); padding: 12px 14px; opacity: 0.75;">
+      <div class="card panorama-item" data-id="p2" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
         <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
-          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></div>
-          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700; text-decoration: line-through;">Empire State Building</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 350 Fifth Ave, Manhattan</div></div>
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Empire State Building</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 350 Fifth Ave, Manhattan</div></div>
         </div>
         <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
       </div>
@@ -510,6 +521,110 @@
         <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
       </div>
 
+      <div class="card panorama-item" data-id="c1" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Quinta Avenida</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 5th Ave, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1" selected>Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c2" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Summit (One Vanderbilt)</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 1 Vanderbilt Ave, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1" selected>Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c3" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Estatua de la Libertad</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Liberty Island (ferry desde Battery Park)</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2" selected>Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c4" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Wall Street</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Financial District, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2" selected>Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c5" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Oculus</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 185 Greenwich St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2" selected>Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c6" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Chinatown</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Canal St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2" selected>Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c7" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Little Italy</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Mulberry St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2" selected>Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c8" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Vessel</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 20 Hudson Yards, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3" selected>Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c9" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Chelsea Market</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 75 9th Ave, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3" selected>Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c10" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Brooklyn (DUMBO / Brooklyn Heights)</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 DUMBO, Brooklyn</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4" selected>Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c11" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">SoHo</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Broadway & Prince St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4" selected>Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c12" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Central Park</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 5th Ave & 59th St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5" selected>Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c13" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">The Met</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 1000 5th Ave, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5" selected>Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
       <button onclick="document.getElementById('panorama-add-row').classList.toggle('show')" style="margin-top: 4px; background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--gold); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add spot">+ Agregar panorama</button>
       <div id="panorama-add-row" class="inline-add">
         <input id="panorama-new-name" type="text" placeholder="Nombre del lugar">
@@ -543,12 +658,15 @@
           <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
         </div>
         <div class="day-body">
-          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Times Square</div><div style="color: var(--text-muted); font-size: 11px;">📌 Broadway & W 42-47th St, Manhattan</div></div>
+          <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-1"></div>
-          <div class="day-expenses" data-day="1"></div>
-          <div id="day-empty-1" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
-          <button onclick="go('nuevogasto');preselectDay(1)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
-        </div>
+          <button onclick="document.getElementById('day-place-add-1').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
+          <div id="day-place-add-1" class="inline-add" style="margin-bottom: 8px;">
+            <input id="day-place-input-1" type="text" placeholder="Nombre del lugar">
+            <button onclick="addPanoramaForDay(1)" data-en="Add">Agregar</button>
+          </div>
+          <div class="day-expenses" data-day="1" style="display:none;"></div>
+          <div id="day-empty-1" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>        </div>
       </div>
 
       <div class="day-acc" id="day-acc-2">
@@ -558,12 +676,15 @@
           <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
         </div>
         <div class="day-body">
-          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Empire State Building</div><div style="color: var(--text-muted); font-size: 11px;">📌 350 Fifth Ave, Manhattan</div></div>
+          <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-2"></div>
-          <div class="day-expenses" data-day="2"></div>
-          <div id="day-empty-2" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
-          <button onclick="go('nuevogasto');preselectDay(2)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
-        </div>
+          <button onclick="document.getElementById('day-place-add-2').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
+          <div id="day-place-add-2" class="inline-add" style="margin-bottom: 8px;">
+            <input id="day-place-input-2" type="text" placeholder="Nombre del lugar">
+            <button onclick="addPanoramaForDay(2)" data-en="Add">Agregar</button>
+          </div>
+          <div class="day-expenses" data-day="2" style="display:none;"></div>
+          <div id="day-empty-2" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>        </div>
       </div>
 
       <div class="day-acc comic open" id="day-acc-3">
@@ -588,11 +709,15 @@
               <button onclick="addFigura()" data-en="Add">Agregar</button>
             </div>
           </div>
+          <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-3"></div>
-          <div class="day-expenses" data-day="3"></div>
-          <div id="day-empty-3" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
-          <button onclick="go('nuevogasto');preselectDay(3)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
-        </div>
+          <button onclick="document.getElementById('day-place-add-3').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
+          <div id="day-place-add-3" class="inline-add" style="margin-bottom: 8px;">
+            <input id="day-place-input-3" type="text" placeholder="Nombre del lugar">
+            <button onclick="addPanoramaForDay(3)" data-en="Add">Agregar</button>
+          </div>
+          <div class="day-expenses" data-day="3" style="display:none;"></div>
+          <div id="day-empty-3" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>        </div>
       </div>
 
       <div class="day-acc" id="day-acc-4">
@@ -602,12 +727,15 @@
           <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
         </div>
         <div class="day-body">
-          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Brooklyn Bridge</div><div style="color: var(--text-muted); font-size: 11px;">📌 Entre City Hall Park y Cadman Plaza</div></div>
+          <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-4"></div>
-          <div class="day-expenses" data-day="4"></div>
-          <div id="day-empty-4" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
-          <button onclick="go('nuevogasto');preselectDay(4)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
-        </div>
+          <button onclick="document.getElementById('day-place-add-4').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
+          <div id="day-place-add-4" class="inline-add" style="margin-bottom: 8px;">
+            <input id="day-place-input-4" type="text" placeholder="Nombre del lugar">
+            <button onclick="addPanoramaForDay(4)" data-en="Add">Agregar</button>
+          </div>
+          <div class="day-expenses" data-day="4" style="display:none;"></div>
+          <div id="day-empty-4" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>        </div>
       </div>
 
       <div class="day-acc" id="day-acc-5">
@@ -617,12 +745,15 @@
           <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
         </div>
         <div class="day-body">
-          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;">St. Patrick's Cathedral</div><div style="color: var(--text-muted); font-size: 11px;">📌 5th Ave & 51st St, Manhattan</div></div>
+          <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-5"></div>
-          <div class="day-expenses" data-day="5"></div>
-          <div id="day-empty-5" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
-          <button onclick="go('nuevogasto');preselectDay(5)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
-        </div>
+          <button onclick="document.getElementById('day-place-add-5').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
+          <div id="day-place-add-5" class="inline-add" style="margin-bottom: 8px;">
+            <input id="day-place-input-5" type="text" placeholder="Nombre del lugar">
+            <button onclick="addPanoramaForDay(5)" data-en="Add">Agregar</button>
+          </div>
+          <div class="day-expenses" data-day="5" style="display:none;"></div>
+          <div id="day-empty-5" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>        </div>
       </div>
 
       <div class="day-acc" id="day-acc-6">
@@ -633,12 +764,19 @@
         </div>
         <div class="day-body">
           <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;" data-en="Flight back to Chile. Heads up: Columbus Day Parade runs 5th Ave. 11:30am-3:30pm — check it fits before heading to the airport.">Vuelo de regreso a Chile. Ojo: el Columbus Day Parade pasa por la 5ta Ave. de 11:30am a 3:30pm — revisa si calza antes de ir al aeropuerto.</div>
-          <div class="suggest-card"><span style="color: var(--gold); font-size: 11px; font-weight: 700;" data-en="💡 Suggested (to confirm)">💡 Sugerido (por confirmar)</span><div style="font-size: 13px; font-weight: 600; margin-top: 2px;" data-en="Central Park (if the flight leaves in the afternoon)">Central Park (si el vuelo sale en la tarde)</div><div style="color: var(--text-muted); font-size: 11px;">📌 5th Ave & 59th St, Manhattan</div></div>
+          <div class="suggest-card" style="border-color: var(--green);">
+            <span style="color: var(--green); font-size: 11px; font-weight: 700;" data-en="✅ Confirmed">✅ Confirmado</span>
+            <div style="font-size: 13px; font-weight: 600; margin-top: 4px;" data-en="Shopping & odds and ends before heading to the airport">Compras y otros antes de ir al aeropuerto</div>
+          </div>
+          <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-6"></div>
-          <div class="day-expenses" data-day="6"></div>
-          <div id="day-empty-6" style="color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>
-          <button onclick="go('nuevogasto');preselectDay(6)" style="margin-top: 8px; width: 100%; background: var(--border); border: none; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add expense">+ Agregar gasto</button>
-        </div>
+          <button onclick="document.getElementById('day-place-add-6').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
+          <div id="day-place-add-6" class="inline-add" style="margin-bottom: 8px;">
+            <input id="day-place-input-6" type="text" placeholder="Nombre del lugar">
+            <button onclick="addPanoramaForDay(6)" data-en="Add">Agregar</button>
+          </div>
+          <div class="day-expenses" data-day="6" style="display:none;"></div>
+          <div id="day-empty-6" style="display:none; color: var(--text-muted); font-size: 12px; padding: 8px 0;" data-en="No expenses logged this day.">Sin gastos registrados este día.</div>        </div>
       </div>
 
       <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
@@ -661,7 +799,7 @@
   <!-- ============ NUEVO GASTO ============ -->
   <section class="screen" id="screen-nuevogasto">
     <div class="header-row">
-      <button class="back-btn" onclick="go('itinerario')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <button class="back-btn" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
       <div class="poster" style="font-size: 20px;" data-en="NEW EXPENSE">NUEVO GASTO</div>
     </div>
     <div class="scroll">
@@ -706,7 +844,6 @@
           <button class="chip chip-on" style="background: var(--gold); color: #05060d;" onclick="selectChip(this,'gasto-pay-chips')">💵 <span data-en="Cash">Efectivo</span></button>
           <button class="chip chip-off" onclick="selectChip(this,'gasto-pay-chips')">💳 <span data-en="Credit">Crédito</span></button>
           <button class="chip chip-off" onclick="selectChip(this,'gasto-pay-chips')">💳 <span data-en="Debit">Débito</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'gasto-pay-chips')">🔄 <span data-en="Transfer">Transferencia</span></button>
         </div>
       </div>
       <div>
@@ -723,14 +860,6 @@
           </label>
         </div>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <label style="flex: 1; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--gold); border-radius: 10px; padding: 10px 12px;">
-          <span style="color: var(--gold); font-size: 12px; font-weight: 700;" data-en="⚡ Unplanned">⚡ Imprevisto</span><input id="chk-imprevisto" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--gold);">
-        </label>
-        <label style="flex: 1; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;">
-          <span style="font-size: 12px; font-weight: 700;" data-en="🙌 Tip">🙌 Propina</span><input id="chk-propina" type="checkbox" style="width: 18px; height: 18px; accent-color: var(--green);">
-        </label>
-      </div>
       <button onclick="saveMainExpense()" style="margin-top: 6px; background: var(--gold); color: #05060d; text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer;" data-en="Save expense">Guardar gasto</button>
       <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
     </div>
@@ -744,54 +873,106 @@
       <button class="eye-btn" id="eye-btn" onclick="toggleMoneyVisibility()">👁</button>
     </div>
     <div class="scroll">
-      <div class="card" style="padding: 18px;">
+      <div class="card" style="padding: 18px; border-color: var(--gold);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="color: var(--text-muted); font-size: 11px;" data-en="Fixed budget">Presupuesto fijo</span>
-          <button onclick="editBudget()" style="background: none; border: none; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer;" data-en="✎ Edit">✎ Editar</button>
+          <span style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;" data-en="Estimated trip budget">Presupuesto estimado de viaje</span>
+          <button onclick="editEstimated()" style="background: none; border: none; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer;" data-en="✎ Edit">✎ Editar</button>
         </div>
-        <div style="display: flex; gap: 10px; align-items: baseline; margin-top: 2px;">
-          <div id="pres-budget-amount" class="money-value" style="font-size: 22px; font-weight: 700;">US$ 1.800</div>
-          <div id="pres-budget-clp" class="money-value" style="color: var(--text-muted); font-size: 12px;">≈ $1.728.900 CLP</div>
-        </div>
-        <div id="budget-edit-row" class="inline-add" style="margin-top: 8px; flex-direction: column; align-items: stretch;">
-          <div style="display: flex; gap: 8px;">
-            <input id="budget-usd-value" type="text" placeholder="Monto en USD" oninput="syncBudgetFromUsd()">
-            <input id="budget-clp-value" type="text" placeholder="Monto en CLP" oninput="syncBudgetFromClp()">
-          </div>
-          <button onclick="confirmBudget()" style="margin-top: 8px;" data-en="Save">Guardar</button>
+        <div id="presupuesto-estimado" class="money-value" style="font-size: 24px; font-weight: 700; margin-top: 2px;">US$ 0</div>
+        <div style="color: var(--text-dim); font-size: 10px; margin-top: 2px;" data-en="What you plan to spend on the trip — set it manually, it doesn't change on its own">Lo que planificas gastar en el viaje — lo defines tú, no cambia solo</div>
+        <div id="edit-estimado-row" class="inline-add" style="margin-top: 8px;">
+          <input id="edit-estimado-input" type="text" placeholder="Nuevo presupuesto estimado USD">
+          <button onclick="confirmEditEstimated()" data-en="Save">Guardar</button>
         </div>
 
         <div style="height: 1px; background: var(--border); margin: 14px 0;"></div>
 
+        <div class="poster" style="font-size: 14px;" data-en="OVERALL INITIAL BALANCE">SALDO GENERAL INICIAL</div>
+        <div id="saldo-general-inicial" class="money-value" style="font-size: 28px; font-weight: 700; margin-top: 4px;">US$ 0</div>
+        <div style="color: var(--text-muted); font-size: 11px; margin-top: 4px;" data-en="= sum of the 3 initial balances by payment method (below) — the real money you're carrying">= suma de los 3 saldos iniciales por forma de pago (abajo) — la plata real que llevas</div>
+        <div id="estimado-vs-real" style="margin-top: 8px; font-size: 11px; padding: 6px 10px; border-radius: 8px;"></div>
+      </div>
+
+      <div class="card" style="padding: 18px;">
+        <div class="poster" style="font-size: 14px;" data-en="BALANCES BY PAYMENT METHOD">SALDOS POR FORMA DE PAGO</div>
+        <div style="color: var(--text-muted); font-size: 11px; margin-top: 2px;" data-en="Each method has its own balance, independent of the others">Cada método tiene su propio saldo, independiente de los demás</div>
+
+        <div style="padding: 12px 0; border-top: 1px solid var(--border); margin-top: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 700;">💵 <span data-en="Cash">Efectivo</span></span>
+            <button onclick="editBalance('efectivo')" style="background: none; border: none; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer;" data-en="✎ Edit">✎ Editar</button>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
+            <span data-en="Initial:">Inicial: <span id="bal-efectivo-inicial" class="money-value" style="color: var(--text);">US$ 0</span></span>
+            <span data-en="Spent:">Gastado: <span id="bal-efectivo-gastado" class="money-value" style="color: var(--text);">US$ 0</span></span>
+          </div>
+          <div style="text-align: right; margin-top: 4px;"><span id="bal-efectivo-disp" class="money-value" style="font-size: 17px; font-weight: 700; color: var(--green);">US$ 0</span> <span style="color: var(--text-muted); font-size: 11px;" data-en="available">disponible</span></div>
+          <div id="edit-efectivo-row" class="inline-add" style="margin-top: 8px;">
+            <input id="edit-efectivo-input" type="text" placeholder="Nuevo saldo inicial USD">
+            <button onclick="confirmEditBalance('efectivo')" data-en="Save">Guardar</button>
+          </div>
+        </div>
+
+        <div style="padding: 12px 0; border-top: 1px solid var(--border);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 700;">💳 <span data-en="Credit">Crédito</span></span>
+            <button onclick="editBalance('credito')" style="background: none; border: none; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer;" data-en="✎ Edit">✎ Editar</button>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
+            <span data-en="Initial:">Inicial: <span id="bal-credito-inicial" class="money-value" style="color: var(--text);">US$ 0</span></span>
+            <span data-en="Spent:">Gastado: <span id="bal-credito-gastado" class="money-value" style="color: var(--text);">US$ 0</span></span>
+          </div>
+          <div style="text-align: right; margin-top: 4px;"><span id="bal-credito-disp" class="money-value" style="font-size: 17px; font-weight: 700; color: var(--green);">US$ 0</span> <span style="color: var(--text-muted); font-size: 11px;" data-en="available">disponible</span></div>
+          <div id="edit-credito-row" class="inline-add" style="margin-top: 8px;">
+            <input id="edit-credito-input" type="text" placeholder="Nuevo saldo inicial USD">
+            <button onclick="confirmEditBalance('credito')" data-en="Save">Guardar</button>
+          </div>
+        </div>
+
+        <div style="padding: 12px 0; border-top: 1px solid var(--border);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 700;">💳 <span data-en="Debit">Débito</span></span>
+            <button onclick="editBalance('debito')" style="background: none; border: none; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer;" data-en="✎ Edit">✎ Editar</button>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
+            <span data-en="Initial:">Inicial: <span id="bal-debito-inicial" class="money-value" style="color: var(--text);">US$ 0</span></span>
+            <span data-en="Spent:">Gastado: <span id="bal-debito-gastado" class="money-value" style="color: var(--text);">US$ 0</span></span>
+          </div>
+          <div style="text-align: right; margin-top: 4px;"><span id="bal-debito-disp" class="money-value" style="font-size: 17px; font-weight: 700; color: var(--green);">US$ 0</span> <span style="color: var(--text-muted); font-size: 11px;" data-en="available">disponible</span></div>
+          <div id="edit-debito-row" class="inline-add" style="margin-top: 8px;">
+            <input id="edit-debito-input" type="text" placeholder="Nuevo saldo inicial USD">
+            <button onclick="confirmEditBalance('debito')" data-en="Save">Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 18px;">
         <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          <span class="poster" style="font-size: 14px;" data-en="BALANCE">BALANCE</span>
+          <span class="poster" style="font-size: 14px;" data-en="TOTAL BALANCE">BALANCE TOTAL</span>
           <span id="pres-pct" style="color: var(--gold); font-size: 12px; font-weight: 700;">63% <span data-en="used">usado</span></span>
         </div>
         <div style="height: 10px; background: var(--bg); border-radius: 6px; margin-top: 10px; overflow: hidden; border: 1px solid var(--border);">
           <div id="pres-bar" style="width: 63%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--red)); transition: width .3s;"></div>
         </div>
         <div style="display: flex; justify-content: space-between; margin-top: 12px;">
-          <div><div style="color: var(--text-muted); font-size: 11px;" data-en="Spent">Gastado</div><div id="pres-spent" class="money-value" style="font-size: 15px; font-weight: 700;">US$ 1.140</div></div>
-          <div style="text-align: right;"><div style="color: var(--text-muted); font-size: 11px;" data-en="Available">Disponible</div><div id="pres-avail2" class="money-value" style="color: var(--green); font-size: 15px; font-weight: 700;">US$ 660</div></div>
+          <div><div style="color: var(--text-muted); font-size: 11px;" data-en="Budget">Presupuesto</div><div id="pres-budget-amount" class="money-value" style="font-size: 15px; font-weight: 700;">US$ 0</div></div>
+          <div><div style="color: var(--text-muted); font-size: 11px;" data-en="Spent">Gastado</div><div id="pres-spent" class="money-value" style="font-size: 15px; font-weight: 700;">US$ 0</div></div>
+          <div style="text-align: right;"><div style="color: var(--text-muted); font-size: 11px;" data-en="Available">Disponible</div><div id="pres-avail2" class="money-value" style="color: var(--green); font-size: 15px; font-weight: 700;">US$ 0</div></div>
         </div>
       </div>
 
-      <div class="card" style="padding: 14px 16px; display: flex; align-items: center; gap: 14px;">
-        <svg id="radar-svg" viewBox="0 0 100 60" width="90" height="54"></svg>
-        <div>
-          <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase;" data-en="Unplanned radar">Radar de imprevistos</div>
-          <div id="radar-pct-label" style="font-size: 18px; font-weight: 700; margin-top: 2px;">6%</div>
-          <div style="color: var(--text-muted); font-size: 10px;" data-en="of your spending was unplanned">de tu gasto fue imprevisto</div>
+      <div class="card" style="padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span class="poster" style="font-size: 14px;" data-en="EXPENSES BY CATEGORY">GASTOS POR CATEGORÍA</span>
+          <button onclick="exportCSV()" style="background: var(--card-alt); border: 1px solid var(--border); color: var(--gold); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 8px; cursor: pointer;" data-en="⬇ CSV">⬇ CSV</button>
         </div>
-      </div>
-
-      <div class="card" style="padding: 14px 16px;">
-        <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; margin-bottom: 8px;" data-en="By payment method (whole trip)">Por forma de pago (todo el viaje)</div>
-        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">💵</span><span id="pay-total-efectivo" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span></div>
-          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">💳</span><span id="pay-total-credito" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span><span style="color: var(--text-muted); font-size: 10px;" data-en="cr.">créd.</span></div>
-          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">💳</span><span id="pay-total-debito" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span><span style="color: var(--text-muted); font-size: 10px;" data-en="db.">déb.</span></div>
-          <div style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px;">🔄</span><span id="pay-total-transferencia" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 0</span></div>
+        <div style="color: var(--text-muted); font-size: 10px; margin-bottom: 8px;" data-en="Tap a category to see its detail">Toca una categoría para ver su detalle</div>
+        <div id="category-breakdown"></div>
+        <div id="category-empty" style="color: var(--text-muted); font-size: 12px; padding: 8px 0; display:none;" data-en="No expenses logged yet.">Aún no hay gastos registrados.</div>
+        <button onclick="document.getElementById('new-cat-row').classList.toggle('show')" style="width:100%; background: var(--card-alt); border: 1px dashed var(--border); border-radius: 10px; padding: 10px; color: var(--gold); font-size: 12px; font-weight: 700; cursor: pointer;" data-en="+ Add category">+ Agregar categoría</button>
+        <div id="new-cat-row" class="inline-add">
+          <input id="new-cat-name" type="text" placeholder="Nombre de la categoría">
+          <button onclick="addCustomCategory()" data-en="Add">Agregar</button>
         </div>
       </div>
 
@@ -809,12 +990,6 @@
           <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px;"><span style="color: var(--red); font-size: 11px; font-weight: 700;">CLP</span><span id="convert-clp" class="money-value" style="font-size: 13px; font-weight: 700; display:block;">96.050</span></div>
           <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px;"><span style="color: var(--blue); font-size: 11px; font-weight: 700;">EUR</span><span id="convert-eur" class="money-value" style="font-size: 13px; font-weight: 700; display:block;">86,00</span></div>
         </div>
-      </div>
-
-      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="go('preview')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
-        <span style="font-size: 12px; flex: 1;" data-en="Pre-trip expenses (flights, hotel, insurance)">Gastos pre-viaje (vuelos, hotel, seguro)</span>
-        <span id="pres-preview-total" class="money-value" style="font-size: 13px; font-weight: 700;">US$ 950</span>
       </div>
 
       <div class="card" style="border-color: var(--blue); padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="go('compartidos')">
@@ -852,10 +1027,16 @@
         <div id="esteban-clp" class="money-value" style="color: var(--text-dim); font-size: 12px; margin-top: 2px;">≈ $0 CLP</div>
       </div>
 
-      <div>
-        <div style="color: var(--gold); font-size: 13px; font-weight: 700; margin-bottom: 8px;" data-en="ACCOUNT DETAIL">DETALLE DE LA CUENTA</div>
-        <div id="esteban-detail" style="display: flex; flex-direction: column; gap: 8px;"></div>
-        <div id="compartidos-empty" style="color: var(--text-muted); font-size: 12px; padding: 12px 0; text-align: center;" data-en="No shared expenses logged yet.">Aún no registras gastos compartidos.</div>
+      <div class="acc-item open" id="acc-compartidos-detail">
+        <div class="acc-header" onclick="toggleAcc('acc-compartidos-detail')">
+          <div class="acc-icon">📋</div>
+          <div class="acc-title-wrap"><div class="acc-title" data-en="ACCOUNT DETAIL">DETALLE DE LA CUENTA</div><div class="acc-badge" id="compartidos-count" data-en="0 entries">0 movimientos</div></div>
+          <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="acc-body">
+          <div id="esteban-detail" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          <div id="compartidos-empty" style="color: var(--text-muted); font-size: 12px; padding: 12px 0; text-align: center;" data-en="No shared expenses logged yet.">Aún no registras gastos compartidos.</div>
+        </div>
       </div>
 
       <button onclick="go('nuevocompartido')" style="background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--blue); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add shared expense">+ Agregar gasto compartido</button>
@@ -893,6 +1074,18 @@
         <input id="comp-desc" type="text" placeholder="Ej: Uber al Javits Center" style="width: 100%; margin-top: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 14px;">
       </div>
       <div>
+        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Expense type">Tipo de gasto</label>
+        <div id="comp-cat-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+          <button class="chip chip-off" onclick="selectChip(this,'comp-cat-chips')">🏨 <span data-en="Lodging">Alojamiento</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-cat-chips')">🚕 <span data-en="Transport">Transporte</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-cat-chips')">🍔 <span data-en="Food">Comida</span></button>
+          <button class="chip chip-on" onclick="selectChip(this,'comp-cat-chips')">🎟 <span data-en="Tickets/activities">Entradas/actividades</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-cat-chips')">🛍 <span data-en="Shopping">Compras</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-cat-chips')">🎁 <span data-en="Gifts">Regalos</span></button>
+          <button class="chip chip-off" onclick="selectChip(this,'comp-cat-chips')">➕ <span data-en="Other">Otra</span></button>
+        </div>
+      </div>
+      <div>
         <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Trip day (optional)">Día del viaje (opcional)</label>
         <div id="comp-day-chips" style="display: flex; gap: 8px; margin-top: 8px; overflow-x: auto;">
           <button class="chip chip-on" data-day="0" onclick="selectChip(this,'comp-day-chips')" data-en="No day">Sin día</button>
@@ -910,7 +1103,6 @@
           <button class="chip chip-on" style="background: var(--gold); color: #05060d;" onclick="selectChip(this,'comp-pay-chips')">💵 <span data-en="Cash">Efectivo</span></button>
           <button class="chip chip-off" onclick="selectChip(this,'comp-pay-chips')">💳 <span data-en="Credit">Crédito</span></button>
           <button class="chip chip-off" onclick="selectChip(this,'comp-pay-chips')">💳 <span data-en="Debit">Débito</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'comp-pay-chips')">🔄 <span data-en="Transfer">Transferencia</span></button>
         </div>
       </div>
       <div>
@@ -1000,84 +1192,10 @@
     </div>
   </section>
 
-  <!-- ============ GASTOS PRE-VIAJE ============ -->
-  <section class="screen" id="screen-preview">
-    <div class="header-row">
-      <button class="back-btn" onclick="go('presupuesto')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
-      <div class="poster" style="font-size: 18px;" data-en="PRE-TRIP EXPENSES">GASTOS PRE-VIAJE</div>
-    </div>
-    <div style="padding: 14px 20px 0 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-      <span style="color: var(--text-muted); font-size: 12px;" data-en="Pre-trip total">Total pre-viaje</span>
-      <span id="preview-total" class="money-value" style="font-size: 18px; font-weight: 700;">US$ 950</span>
-    </div>
-    <div class="scroll" id="preview-list">
-      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
-        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">✈️</div>
-        <div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;" data-en="Flights Santiago–NY">Vuelos Santiago–NY</div><span class="tag" data-en="💳 Credit">💳 Crédito</span></div>
-        <div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ 600</div></div>
-      </div>
-      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
-        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🏨</div>
-        <div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;" data-en="Hotel (4 nights)">Hotel (4 noches)</div><span class="tag" data-en="💳 Debit">💳 Débito</span></div>
-        <div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ 300</div></div>
-      </div>
-      <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
-        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🛡</div>
-        <div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;" data-en="Travel insurance">Seguro de viaje</div><span class="tag" data-en="🔄 Transfer">🔄 Transferencia</span></div>
-        <div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ 50</div></div>
-      </div>
-      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
-    </div>
-    <button onclick="go('nuevogastoprev')" style="position: absolute; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--gold); border: 2px solid var(--text); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(77,184,255,0.3); cursor: pointer;">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
-    </button>
-  </section>
-
-  <!-- ============ NUEVO GASTO PRE-VIAJE ============ -->
-  <section class="screen" id="screen-nuevogastoprev">
-    <div class="header-row">
-      <button class="back-btn" onclick="go('preview')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
-      <div class="poster" style="font-size: 18px;" data-en="PRE-TRIP EXPENSE">GASTO PRE-VIAJE</div>
-    </div>
-    <div class="scroll">
-      <div class="card" style="padding: 18px; text-align: center;">
-        <label style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;" data-en="Amount (USD)">Monto (USD)</label>
-        <div style="display: flex; align-items: baseline; justify-content: center; gap: 6px; margin-top: 6px;">
-          <span style="color: var(--gold); font-size: 28px; font-weight: 700;">US$</span><input id="prev-amount" type="text" value="0" style="background: none; border: none; font-size: 40px; font-weight: 700; width: 140px; text-align: center;">
-        </div>
-      </div>
-      <div>
-        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Description">Descripción</label>
-        <input id="prev-desc" type="text" placeholder="Ej: Pase de metro semanal" style="width: 100%; margin-top: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 14px;">
-      </div>
-      <div>
-        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Category">Categoría</label>
-        <div id="prev-cat-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
-          <button class="chip chip-on" onclick="selectChip(this,'prev-cat-chips')">✈️ <span data-en="Flights">Vuelos</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">🏨 <span data-en="Hotel">Hotel</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">🛡 <span data-en="Insurance">Seguro</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">🧳 <span data-en="Baggage">Equipaje</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'prev-cat-chips')">+ <span data-en="Other">Otra</span></button>
-        </div>
-      </div>
-      <div>
-        <label style="color: var(--text-muted); font-size: 12px; font-weight: 700;" data-en="Payment method">Forma de pago</label>
-        <div id="prev-pay-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
-          <button class="chip chip-on" style="background: var(--gold); color: #05060d;" onclick="selectChip(this,'prev-pay-chips')">💵 <span data-en="Cash">Efectivo</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'prev-pay-chips')">💳 <span data-en="Credit">Crédito</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'prev-pay-chips')">💳 <span data-en="Debit">Débito</span></button>
-          <button class="chip chip-off" onclick="selectChip(this,'prev-pay-chips')">🔄 <span data-en="Transfer">Transferencia</span></button>
-        </div>
-      </div>
-      <button onclick="savePrevExpense()" style="margin-top: 6px; background: var(--gold); color: #05060d; text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer;" data-en="Save expense">Guardar gasto</button>
-      <div class="footer-credit">Diego NYC Oct '26 · by Melitalove · v1.0</div>
-    </div>
-  </section>
-
 </div>
 
 <script>
-  var state = { budget: 1800, spent: 1140, esteban: 0, estebanSettled: false, prevTotal: 950, panoVisited: 2, panoTotal: 16, customDocCount: 0, imprevistoTotal: 65 };
+  var state = { balances: { efectivo: 0, credito: 0, debito: 0 }, esteban: 0, estebanSettled: false, panoVisited: 0, panoTotal: 28, customDocCount: 0, imprevistoTotal: 0, customCategories: [], estimatedBudget: 0 };
   var currentLang = 'es';
   var moneyHidden = false;
   var STORE_KEY = 'diego_nyc_state_v4';
@@ -1122,7 +1240,11 @@
       document.querySelectorAll('#figura-list .pack-row').forEach(function(r){
         figuras.push({ name: r.querySelector('.pack-label').childNodes[0].textContent.trim(), obtained: r.querySelector('input').checked });
       });
-      var payload = { state: state, docs: docs, pack: pack, pend: pend, pano: panoState, customDocTitles: window.__customDocTitles, moneyHidden: moneyHidden, figuras: figuras };
+      var encargos = [];
+      document.querySelectorAll('#souv-list-encargos .pack-row').forEach(function(r){
+        encargos.push({ html: r.querySelector('.pack-label').innerHTML, obtained: r.querySelector('input').checked });
+      });
+      var payload = { state: state, docs: docs, pack: pack, pend: pend, pano: panoState, customDocTitles: window.__customDocTitles, moneyHidden: moneyHidden, figuras: figuras, encargos: encargos };
       localStorage.setItem(STORE_KEY, JSON.stringify(payload));
     } catch(e) { /* almacenamiento no disponible - la app sigue funcionando en memoria */ }
   }
@@ -1133,6 +1255,9 @@
     var data;
     try { data = JSON.parse(raw); } catch(e) { return; }
     if (data.state) Object.assign(state, data.state);
+    if (state.customCategories && state.customCategories.length) {
+      state.customCategories.forEach(function(c){ addCatChip(c.label); });
+    }
     if (typeof data.moneyHidden === 'boolean') moneyHidden = data.moneyHidden;
     if (data.pack) {
       Object.keys(data.pack).forEach(function(id){
@@ -1161,7 +1286,7 @@
       data.customDocTitles.forEach(function(t){ createCustomDocSlot(t, false); });
       window.__customDocTitles = data.customDocTitles.slice();
       state.customDocCount = data.customDocTitles.length;
-      if (state.customDocCount >= 4) document.getElementById('btn-add-custom-doc').style.display = 'none';
+      if (state.customDocCount >= 6) document.getElementById('btn-add-custom-doc').style.display = 'none';
     }
     if (data.docs && data.docs.length) {
       data.docs.forEach(function(d){ renderDocRow(d.cat, d.name, d.dataUrl, d.isImage); });
@@ -1176,7 +1301,21 @@
       });
       if (data.figuras.length) document.getElementById('figura-empty').style.display = 'none';
     }
+    if (data.encargos && data.encargos.length) {
+      data.encargos.forEach(function(en){
+        var row = document.createElement('div');
+        row.className = 'pack-row';
+        row.innerHTML = '<input type="checkbox"' + (en.obtained ? ' checked' : '') + ' onchange="toggleSouv(this)"><span class="pack-label' + (en.obtained ? ' checked' : '') + '">' + en.html + '</span>';
+        document.getElementById('souv-list-encargos').insertBefore(row, document.getElementById('encargos-empty'));
+      });
+      document.getElementById('encargos-empty').style.display = 'none';
+      var encCount = document.querySelectorAll('#souv-list-encargos .pack-row').length;
+      var encBadge = document.getElementById('badge-encargos');
+      if (encBadge) encBadge.textContent = encCount;
+    }
     refreshItineraryPanoramas();
+    retrofitPanoramaControls();
+    retrofitPackRowControls();
     updateDocBadge();
     if (moneyHidden) {
       document.querySelectorAll('.money-value').forEach(function(el){
@@ -1212,6 +1351,61 @@
     btn.classList.remove('chip-off'); btn.classList.add('chip-on');
   }
 
+  function editPackLabel(btn){
+    var row = btn.closest('.pack-row');
+    var label = row.querySelector('.pack-label');
+    var trailingSpan = label.querySelector('span');
+    var trailingHTML = trailingSpan ? trailingSpan.outerHTML : '';
+    var currentText = trailingSpan ? label.childNodes[0].textContent.trim() : label.textContent.trim();
+    var input = document.createElement('input');
+    input.type = 'text'; input.value = currentText;
+    input.style.cssText = 'flex:1; min-width: 80px; background: var(--bg); border: 1px solid var(--blue); border-radius: 6px; color: var(--text); font-size: 13px; padding: 4px 6px;';
+    label.replaceWith(input);
+    input.focus(); input.select();
+    function commit(){
+      var val = input.value.trim() || currentText;
+      var newLabel = document.createElement('span');
+      newLabel.className = label.className;
+      newLabel.innerHTML = val + (trailingHTML ? ' ' + trailingHTML : '');
+      input.replaceWith(newLabel);
+      saveState();
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') input.blur(); });
+  }
+  function deletePackRow(btn){
+    var row = btn.closest('.pack-row');
+    var container = row.parentElement;
+    var cid = container.id;
+    row.remove();
+    if (cid === 'pack-list') updatePackBadge();
+    else if (cid === 'pend-list') updatePendBadge();
+    else if (cid === 'souv-list-encargos') {
+      var count = document.querySelectorAll('#souv-list-encargos .pack-row').length;
+      var badge = document.getElementById('badge-encargos'); if (badge) badge.textContent = count;
+      var empty = document.getElementById('encargos-empty'); if (empty && count === 0) empty.style.display = 'block';
+    } else if (cid === 'figura-list') {
+      var anyLeft = document.querySelectorAll('#figura-list .pack-row').length > 0;
+      var femp = document.getElementById('figura-empty'); if (femp && !anyLeft) femp.style.display = 'block';
+    }
+    checkMilestones(); saveState();
+  }
+  function retrofitPackRowControls(){
+    document.querySelectorAll('.pack-row').forEach(function(row){
+      if (row.querySelector('.prow-edit-btn')) return;
+      var editBtn = document.createElement('button');
+      editBtn.className = 'prow-edit-btn'; editBtn.textContent = '✎'; editBtn.title = 'Editar';
+      editBtn.style.cssText = 'background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px;margin-left:auto;flex-shrink:0;';
+      editBtn.onclick = function(e){ e.stopPropagation(); editPackLabel(this); };
+      var delBtn = document.createElement('button');
+      delBtn.textContent = '🗑'; delBtn.title = 'Eliminar';
+      delBtn.style.cssText = 'background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0;';
+      delBtn.onclick = function(e){ e.stopPropagation(); deletePackRow(this); };
+      row.appendChild(editBtn);
+      row.appendChild(delBtn);
+    });
+  }
+
   function addFigura(){
     var input = document.getElementById('figura-new-item');
     var name = input.value.trim();
@@ -1223,6 +1417,7 @@
     document.getElementById('figura-list').insertBefore(row, document.getElementById('figura-empty'));
     document.getElementById('figura-empty').style.display = 'none';
     input.value = '';
+    retrofitPackRowControls();
     saveState();
   }
   function toggleFigura(cb){
@@ -1257,7 +1452,7 @@
     row.setAttribute('data-id', 'k' + Date.now());
     row.innerHTML = '<input type="checkbox" onchange="togglePack(this)"><span class="pack-label">' + name + '</span>';
     document.getElementById('pack-list').insertBefore(row, document.getElementById('pack-list').lastElementChild);
-    input.value = ''; updatePackBadge(); saveState();
+    input.value = ''; updatePackBadge(); retrofitPackRowControls(); saveState();
   }
 
   function togglePend(cb){
@@ -1279,7 +1474,7 @@
     row.setAttribute('data-id', 'd' + Date.now());
     row.innerHTML = '<input type="checkbox" onchange="togglePend(this)"><span class="pack-label">' + name + '</span>';
     document.getElementById('pend-list').insertBefore(row, document.getElementById('pend-list').lastElementChild);
-    input.value = ''; updatePendBadge(); saveState();
+    input.value = ''; updatePendBadge(); retrofitPackRowControls(); saveState();
   }
 
   function toggleSouv(cb){
@@ -1297,6 +1492,7 @@
     var list = document.getElementById(listId);
     list.insertBefore(row, list.lastElementChild);
     input.value = '';
+    retrofitPackRowControls();
   }
   function addEncargo(){
     var itemInput = document.getElementById('encargo-new-item');
@@ -1313,21 +1509,63 @@
     itemInput.value = ''; quienInput.value = '';
     var count = document.querySelectorAll('#souv-list-encargos .pack-row').length;
     document.getElementById('badge-encargos').textContent = count;
+    retrofitPackRowControls();
   }
 
-  function renderDocRow(cat, name, dataUrl, isImage){
+  var MAX_DOC_SIZE = 3 * 1024 * 1024; // 3 MB
+  var resetConfirming = false;
+  var resetTimer = null;
+  function handleResetClick(){
+    var btn = document.getElementById('reset-app-btn');
+    if (!resetConfirming) {
+      resetConfirming = true;
+      btn.textContent = currentLang === 'en' ? '⚠ Tap again to confirm — this deletes everything' : '⚠ Toca de nuevo para confirmar — esto borra todo';
+      btn.style.color = 'var(--red)';
+      resetTimer = setTimeout(function(){
+        resetConfirming = false;
+        btn.textContent = currentLang === 'en' ? '🗑 Reset all app data' : '🗑 Reiniciar todos los datos de la app';
+        btn.style.color = 'var(--text-dim)';
+      }, 4000);
+    } else {
+      clearTimeout(resetTimer);
+      try { localStorage.removeItem(STORE_KEY); } catch(e) {}
+      location.reload();
+    }
+  }
+
+  var toastTimer = null;
+  function showToast(msg){
+    var el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.style.display = 'none'; }, 3500);
+  }
+  function renderDocRow(cat, name, dataUrl, isImage, mime){
     var container = document.querySelector('.doc-files[data-cat="' + cat + '"]');
     if (!container) return;
     var row = document.createElement('div');
     row.className = 'doc-file-row';
+    var replaceId = 'doc-replace-' + Date.now() + Math.floor(Math.random() * 10000);
     row.setAttribute('data-cat', cat); row.setAttribute('data-name', name); row.setAttribute('data-url', dataUrl); row.setAttribute('data-isimg', isImage ? '1' : '0');
-    row.innerHTML = (isImage ? '<img class="doc-thumb" src="' + dataUrl + '">' : '<div class="doc-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;">📄</div>') +
-      '<span style="font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + name + '</span>';
+    row.innerHTML =
+      (isImage ? '<img class="doc-thumb" src="' + dataUrl + '">' : '<div class="doc-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;">📄</div>') +
+      '<span class="doc-name" style="font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + name + '</span>' +
+      '<button type="button" onclick="editDocName(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0;" title="Renombrar">✎</button>' +
+      '<button type="button" onclick="document.getElementById(\'' + replaceId + '\').click()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0;" title="Reemplazar archivo">🔄</button>' +
+      '<input type="file" id="' + replaceId + '" accept="image/*,application/pdf" style="display:none" onchange="replaceDocFile(this)">' +
+      '<button type="button" onclick="deleteDocRow(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0;" title="Eliminar">🗑</button>';
     container.appendChild(row);
   }
   function addDocument(input, cat){
     if (!input.files || !input.files[0]) return;
     var file = input.files[0];
+    if (file.size > MAX_DOC_SIZE) {
+      showToast(currentLang === 'en' ? 'File too large. Max. 3 MB per file.' : 'Archivo muy pesado. Máx. 3 MB por archivo.');
+      input.value = '';
+      return;
+    }
     var isImage = file.type.indexOf('image') === 0;
     var reader = new FileReader();
     reader.onload = function(e){
@@ -1336,13 +1574,70 @@
     };
     reader.readAsDataURL(file);
   }
+  function replaceDocFile(input){
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    if (file.size > MAX_DOC_SIZE) {
+      showToast(currentLang === 'en' ? 'File too large. Max. 3 MB per file.' : 'Archivo muy pesado. Máx. 3 MB por archivo.');
+      input.value = '';
+      return;
+    }
+    var row = input.closest('.doc-file-row');
+    var isImage = file.type.indexOf('image') === 0;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      row.setAttribute('data-url', e.target.result);
+      row.setAttribute('data-isimg', isImage ? '1' : '0');
+      var thumb = row.querySelector('.doc-thumb');
+      var newThumb;
+      if (isImage) {
+        newThumb = document.createElement('img');
+        newThumb.className = 'doc-thumb'; newThumb.src = e.target.result;
+      } else {
+        newThumb = document.createElement('div');
+        newThumb.className = 'doc-thumb'; newThumb.style.cssText = 'display:flex;align-items:center;justify-content:center;font-size:16px;';
+        newThumb.textContent = '📄';
+      }
+      thumb.replaceWith(newThumb);
+      var nameSpan = row.querySelector('.doc-name');
+      nameSpan.textContent = file.name;
+      row.setAttribute('data-name', file.name);
+      saveState();
+    };
+    reader.readAsDataURL(file);
+  }
+  function editDocName(btn){
+    var row = btn.closest('.doc-file-row');
+    var nameSpan = row.querySelector('.doc-name');
+    var current = nameSpan.textContent;
+    var input = document.createElement('input');
+    input.type = 'text'; input.value = current;
+    input.style.cssText = 'flex:1; min-width: 60px; background: var(--bg); border: 1px solid var(--blue); border-radius: 6px; color: var(--text); font-size: 12px; padding: 3px 6px;';
+    nameSpan.replaceWith(input);
+    input.focus(); input.select();
+    function commit(){
+      var val = input.value.trim() || current;
+      var span = document.createElement('span');
+      span.className = 'doc-name'; span.style.cssText = 'font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+      span.textContent = val;
+      input.replaceWith(span);
+      row.setAttribute('data-name', val);
+      saveState();
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') input.blur(); });
+  }
+  function deleteDocRow(btn){
+    btn.closest('.doc-file-row').remove();
+    updateDocBadge(); checkMilestones(); saveState();
+  }
   function updateDocBadge(){
     var count = document.querySelectorAll('.doc-file-row').length;
     var el = document.getElementById('badge-documentos');
     if (el) el.innerHTML = count + ' ' + (currentLang === 'en' ? 'files loaded' : 'archivos cargados');
   }
   function promptCustomDoc(){
-    if (state.customDocCount >= 4) return;
+    if (state.customDocCount >= 6) return;
     document.getElementById('custom-add-row').classList.add('show');
   }
   function confirmCustomDoc(){
@@ -1362,10 +1657,10 @@
     card.innerHTML =
       '<div style="display: flex; justify-content: space-between; align-items: center;">' +
         '<span style="color: var(--gold); font-size: 13px; font-weight: 700;">📌 ' + title + '</span>' +
-        '<label style="background: var(--border); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;">+ Subir<input type="file" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,\'' + catId + '\')"></label>' +
+        '<button type="button" onclick="document.getElementById(\'doc-file-' + catId + '\').click()" style="background: var(--border); border: none; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer;">+ Subir</button><input type="file" id="doc-file-' + catId + '" accept="image/*,application/pdf" style="display:none" onchange="addDocument(this,\'' + catId + '\')">' +
       '</div><div class="doc-files" data-cat="' + catId + '"></div>';
     document.getElementById('custom-doc-slots').appendChild(card);
-    if (state.customDocCount >= 4) document.getElementById('btn-add-custom-doc').style.display = 'none';
+    if (state.customDocCount >= 6) document.getElementById('btn-add-custom-doc').style.display = 'none';
     if (persist) saveState();
   }
 
@@ -1398,25 +1693,73 @@
       item.style.display = show ? 'block' : 'none';
     });
   }
+  function buildPanoramaRow(name, presetDay){
+    var id = 'p' + Date.now() + Math.floor(Math.random()*1000);
+    var row = document.createElement('div');
+    row.className = 'card panorama-item'; row.setAttribute('data-id', id); row.setAttribute('data-cat', 'clasico'); row.setAttribute('data-visited', 'false');
+    row.style.cssText = 'padding: 12px 14px;';
+    var opts = ['0','1','2','3','4','5','6'].map(function(v){
+      return '<option value="' + v + '"' + (String(presetDay||0) === v ? ' selected' : '') + '>' + (v === '0' ? 'Sin día' : 'Día ' + v) + '</option>';
+    }).join('');
+    row.innerHTML =
+      '<div style="display: flex; align-items: center; gap: 12px;">' +
+      '<div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0; cursor:pointer;" onclick="toggleVisit(this.closest(\'.panorama-item\'))"></div>' +
+      '<div style="flex: 1; cursor:pointer;" onclick="toggleVisit(this.closest(\'.panorama-item\'))"><div class="p-name" style="font-size: 14px; font-weight: 700;">' + name + '</div>' +
+      '<span style="color: var(--text-muted); font-size: 10px;">' + (currentLang === 'en' ? 'Added by you' : 'Agregado por ti') + '</span></div>' +
+      '<button onclick="editPanorama(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;">✎</button>' +
+      '<button onclick="deletePanorama(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;">🗑</button>' +
+      '</div>' +
+      '<div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)">' + opts + '</select></div>';
+    return row;
+  }
   function addPanorama(){
     var nameInput = document.getElementById('panorama-new-name');
     var name = nameInput.value.trim();
     if (!name) return;
-    var id = 'p' + Date.now();
-    var row = document.createElement('div');
-    row.className = 'card panorama-item'; row.setAttribute('data-id', id); row.setAttribute('data-cat', 'clasico'); row.setAttribute('data-visited', 'false');
-    row.style.cssText = 'padding: 12px 14px;';
-    row.innerHTML =
-      '<div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">' +
-      '<div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>' +
-      '<div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">' + name + '</div>' +
-      '<span style="color: var(--text-muted); font-size: 10px;">' + (currentLang === 'en' ? 'Added by you' : 'Agregado por ti') + '</span></div></div>' +
-      '<div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>';
+    var row = buildPanoramaRow(name, 0);
     var list = document.getElementById('panorama-list');
     list.insertBefore(row, document.getElementById('panorama-add-row'));
     state.panoTotal++; updatePanoCount();
     nameInput.value = ''; document.getElementById('panorama-add-row').classList.remove('show');
-    addMapsLinksToPanoramas(); saveState();
+    addMapsLinksToPanoramas(); checkMilestones(); saveState();
+  }
+  function addPanoramaForDay(day){
+    var input = document.getElementById('day-place-input-' + day);
+    var name = input.value.trim();
+    if (!name) return;
+    var row = buildPanoramaRow(name, day);
+    var list = document.getElementById('panorama-list');
+    list.insertBefore(row, document.getElementById('panorama-add-row'));
+    state.panoTotal++; updatePanoCount();
+    input.value = ''; document.getElementById('day-place-add-' + day).classList.remove('show');
+    addMapsLinksToPanoramas(); refreshItineraryPanoramas(); checkMilestones(); saveState();
+  }
+  function editPanorama(btn){
+    var item = btn.closest('.panorama-item');
+    var nameEl = item.querySelector('.p-name');
+    var current = nameEl.textContent;
+    var input = document.createElement('input');
+    input.type = 'text'; input.value = current;
+    input.style.cssText = 'width:100%; background: var(--bg); border: 1px solid var(--blue); border-radius: 6px; color: var(--text); font-size: 14px; font-weight: 700; padding: 3px 6px;';
+    nameEl.replaceWith(input);
+    input.focus(); input.select();
+    function commit(){
+      var val = input.value.trim() || current;
+      var div = document.createElement('div');
+      div.className = 'p-name'; div.style.cssText = 'font-size: 14px; font-weight: 700;' + (item.getAttribute('data-visited') === 'true' ? ' text-decoration: line-through;' : '');
+      div.textContent = val;
+      input.replaceWith(div);
+      addMapsLinksToPanoramas(); refreshItineraryPanoramas(); saveState();
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') input.blur(); });
+  }
+  function deletePanorama(btn){
+    var item = btn.closest('.panorama-item');
+    if (item.getAttribute('data-visited') === 'true') state.panoVisited--;
+    state.panoTotal--;
+    item.remove();
+    updatePanoCount(); refreshItineraryPanoramas(); checkMilestones(); saveState();
   }
   function setPanoDay(sel){ refreshItineraryPanoramas(); saveState(); }
   function refreshItineraryPanoramas(){
@@ -1424,6 +1767,7 @@
       var container = document.getElementById('day-panoramas-' + d);
       if (container) container.innerHTML = '';
     }
+    var counts = {1:0,2:0,3:0,4:0,5:0,6:0};
     document.querySelectorAll('.panorama-item[data-id]').forEach(function(item){
       var sel = item.querySelector('.pano-day-select');
       if (!sel) return;
@@ -1431,13 +1775,76 @@
       if (!day) return;
       var container = document.getElementById('day-panoramas-' + day);
       if (!container) return;
+      counts[day]++;
       var name = item.querySelector('.p-name').textContent;
-      var pill = document.createElement('div');
-      pill.style.cssText = 'display:inline-flex; align-items:center; gap:4px; background: var(--blue-bg); border: 1px solid #1e4a6a; color: var(--blue); font-size: 11px; padding: 4px 9px; border-radius: 12px; margin: 0 6px 6px 0;';
-      pill.textContent = '📍 ' + name;
-      container.appendChild(pill);
+      var row = document.createElement('div');
+      row.className = 'card';
+      row.setAttribute('data-source-id', item.getAttribute('data-id'));
+      row.style.cssText = 'padding: 8px 12px; display:flex; align-items:center; gap:8px; margin-bottom:6px;';
+      row.innerHTML =
+        '<span style="font-size:14px;">📍</span>' +
+        '<span class="day-place-name" style="flex:1; font-size:13px; font-weight:600; cursor:pointer;" onclick="editDayPlaceName(this)" title="Editar nombre">' + name + '</span>' +
+        '<button onclick="unassignDayPlace(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;" title="Quitar de este día">✕</button>';
+      container.appendChild(row);
+    });
+    for (var dd = 1; dd <= 6; dd++) {
+      var c = document.getElementById('day-panoramas-' + dd);
+      if (c && counts[dd] === 0) {
+        c.innerHTML = '<div style="color: var(--text-muted); font-size: 11px; padding: 4px 0 8px 0;" data-en="No places assigned to this day yet.">Aún no hay lugares asignados a este día.</div>';
+      }
+    }
+  }
+  function editDayPlaceName(el){
+    var row = el.closest('div[data-source-id]');
+    var sourceId = row.getAttribute('data-source-id');
+    var source = document.querySelector('.panorama-item[data-id="' + sourceId + '"]');
+    if (!source) return;
+    var sourceNameEl = source.querySelector('.p-name');
+    var current = sourceNameEl.textContent;
+    var input = document.createElement('input');
+    input.type = 'text'; input.value = current;
+    input.style.cssText = 'flex:1; background: var(--bg); border: 1px solid var(--blue); border-radius: 6px; color: var(--text); font-size: 13px; padding: 3px 6px;';
+    el.replaceWith(input);
+    input.focus(); input.select();
+    function commit(){
+      var val = input.value.trim() || current;
+      sourceNameEl.textContent = val;
+      refreshItineraryPanoramas();
+      saveState();
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') input.blur(); });
+  }
+  function unassignDayPlace(btn){
+    var row = btn.closest('div[data-source-id]');
+    var sourceId = row.getAttribute('data-source-id');
+    var source = document.querySelector('.panorama-item[data-id="' + sourceId + '"]');
+    if (source) {
+      var sel = source.querySelector('.pano-day-select');
+      if (sel) sel.value = '0';
+    }
+    refreshItineraryPanoramas();
+    saveState();
+  }
+  function retrofitPanoramaControls(){
+    document.querySelectorAll('.panorama-item').forEach(function(item){
+      if (item.querySelector('.pano-edit-btn')) return;
+      var row = item.querySelector('div[onclick*="toggleVisit"]');
+      if (!row) return;
+      var editBtn = document.createElement('button');
+      editBtn.className = 'pano-edit-btn';
+      editBtn.textContent = '✎'; editBtn.title = 'Editar';
+      editBtn.style.cssText = 'background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;flex-shrink:0;';
+      editBtn.onclick = function(e){ e.stopPropagation(); editPanorama(this); };
+      var delBtn = document.createElement('button');
+      delBtn.textContent = '🗑'; delBtn.title = 'Eliminar';
+      delBtn.style.cssText = editBtn.style.cssText;
+      delBtn.onclick = function(e){ e.stopPropagation(); deletePanorama(this); };
+      row.appendChild(editBtn);
+      row.appendChild(delBtn);
     });
   }
+
   function addMapsLinksToPanoramas(){
     document.querySelectorAll('.panorama-item').forEach(function(item){
       if (item.querySelector('.maps-link')) return;
@@ -1499,7 +1906,6 @@
     if (/Efectivo|Cash/i.test(label)) return 'efectivo';
     if (/Crédito|Credit/i.test(label)) return 'credito';
     if (/Débito|Debit/i.test(label)) return 'debito';
-    if (/Transferencia|Transfer/i.test(label)) return 'transferencia';
     return 'efectivo';
   }
   function saveMainExpense(){
@@ -1514,19 +1920,18 @@
     if (!desc) desc = catLabel.replace(/^[^\s]+\s/, '') || (currentLang === 'en' ? 'Expense' : 'Gasto');
     var quienEl = document.querySelector('input[name="quien"]:checked');
     var quienVal = quienEl ? quienEl.value : 'solo';
-    var imprevisto = document.getElementById('chk-imprevisto').checked;
-    var propina = document.getElementById('chk-propina').checked;
 
     var tagsHtml = '<span class="tag">' + payLabel + '</span>';
-    if (imprevisto) tagsHtml += '<span class="tag tag-gold">' + TAGS.imprevisto[currentLang] + '</span>';
-    if (propina) tagsHtml += '<span class="tag tag-green">' + TAGS.propina[currentLang] + '</span>';
     if (quienVal === 'comp1') tagsHtml += '<span class="tag tag-blue">' + TAGS.compartido[currentLang] + '</span>';
     if (quienVal === 'comp2') tagsHtml += '<span class="tag tag-blue">' + TAGS.pagoEsteban[currentLang] + '</span>';
 
+    var rowId = 'expense-' + Date.now() + Math.floor(Math.random() * 10000);
     var row = document.createElement('div');
     row.className = 'card expense-row';
+    row.id = rowId;
     row.setAttribute('data-day', day); row.setAttribute('data-amount', amount); row.setAttribute('data-pay', mapPayCode(payLabel));
-    row.setAttribute('data-imprevisto', imprevisto ? 1 : 0); row.setAttribute('data-quien', quienVal);
+    row.setAttribute('data-imprevisto', 0); row.setAttribute('data-quien', quienVal);
+    row.setAttribute('data-cat', mapCatCode(catLabel)); row.setAttribute('data-desc', desc);
     row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px;';
     row.innerHTML =
       '<div style="width: 38px; height: 38px; border-radius: 10px; background: var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#05060d" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></div>' +
@@ -1541,100 +1946,233 @@
     container.appendChild(row);
     if (moneyHidden) { var mv = row.querySelector('.money-value'); mv.setAttribute('data-real', mv.textContent); mv.textContent = '••••'; }
 
-    state.spent += amount;
-    if (imprevisto) state.imprevistoTotal += amount;
-    if (quienVal === 'comp1') state.esteban += amount / 2;
-    if (quienVal === 'comp2') state.esteban -= amount;
+    if (quienVal === 'comp1') addCompartidoDetailRow(desc, day, catLabel, payLabel, 'yo', amount, rowId);
+    if (quienVal === 'comp2') addCompartidoDetailRow(desc, day, catLabel, payLabel, 'esteban', amount, rowId);
 
-    updateBudgetDisplays(); updateEstebanDisplay(); computePaymentTotals(); renderItinerario(); renderRadar(); checkMilestones();
+    updateBudgetDisplays(); updateEstebanDisplay(); renderItinerario(); renderCategoryBreakdown(); checkMilestones();
     document.getElementById('gasto-amount').value = '0'; document.getElementById('gasto-desc').value = '';
-    go('itinerario'); openDay(day); saveState();
+    go('presupuesto'); saveState();
   }
 
-  function savePrevExpense() {
-    var amount = parseFloat(document.getElementById('prev-amount').value) || 0;
-    var desc = document.getElementById('prev-desc').value.trim() || (currentLang === 'en' ? 'Pre-trip expense' : 'Gasto pre-viaje');
-    var catBtn = document.querySelector('#prev-cat-chips .chip-on');
-    var payBtn = document.querySelector('#prev-pay-chips .chip-on');
-    var catLabel = catBtn ? catBtn.textContent.trim() : '';
-    var payLabel = payBtn ? payBtn.textContent.trim() : '';
+  function recomputeEstebanBalance(){
+    var total = 0;
+    document.querySelectorAll('#esteban-detail .card').forEach(function(row){
+      var amt = parseFloat(row.getAttribute('data-amount')) || 0;
+      var who = row.getAttribute('data-who');
+      total += (who === 'yo') ? amt / 2 : -amt;
+    });
+    state.esteban = total;
+  }
+  function addCompartidoDetailRow(desc, day, catLabel, payLabel, who, amount, sourceId){
+    var dayText = day ? ((currentLang === 'en' ? 'Day ' : 'Día ') + day + ' · ') : '';
+    var whoText = who === 'yo' ? (currentLang === 'en' ? 'you paid, 50/50' : 'pagaste tú, 50/50') : (currentLang === 'en' ? 'Esteban paid for you' : 'Esteban pagó por ti');
+    var sign = who === 'yo' ? '+' : '-';
+    var displayAmt = who === 'yo' ? (amount / 2) : amount;
     var row = document.createElement('div');
-    row.className = 'card'; row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 12px;';
+    row.className = 'card'; row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 10px;';
+    row.setAttribute('data-amount', amount); row.setAttribute('data-who', who);
+    if (sourceId) row.setAttribute('data-source-expense-id', sourceId);
     row.innerHTML =
-      '<div style="width: 38px; height: 38px; border-radius: 10px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">📌</div>' +
-      '<div style="flex: 1;"><div style="font-size: 14px; font-weight: 700;">' + desc + '</div>' +
-      '<span class="tag">' + payLabel + '</span><span class="tag" style="margin-left:4px;">' + catLabel + '</span></div>' +
-      '<div style="text-align: right;"><div class="money-value" style="font-size: 14px; font-weight: 700;">US$ ' + amount.toLocaleString('es-CL') + '</div></div>';
-    var list = document.getElementById('preview-list');
-    list.insertBefore(row, list.querySelector('.footer-credit'));
-    state.prevTotal += amount;
-    setMoney(document.getElementById('preview-total'), 'US$ ' + state.prevTotal.toLocaleString('es-CL'));
-    setMoney(document.getElementById('pres-preview-total'), 'US$ ' + state.prevTotal.toLocaleString('es-CL'));
-    document.getElementById('prev-amount').value = '0'; document.getElementById('prev-desc').value = '';
-    go('preview'); saveState();
+      '<div style="flex: 1;"><div style="font-size: 13px; font-weight: 600;">' + desc + '</div><div style="color: var(--text-muted); font-size: 11px;">' + (catLabel ? catLabel + ' · ' : '') + dayText + whoText + ' · ' + payLabel + '</div></div>' +
+      '<button onclick="editCompartido(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;">✎</button>' +
+      '<span class="money-value" style="color: ' + (who === 'yo' ? 'var(--green)' : 'var(--orange)') + '; font-size: 13px; font-weight: 700;">' + sign + 'US$ ' + displayAmt.toLocaleString('es-CL') + '</span>' +
+      '<button onclick="deleteCompartido(this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px;">🗑</button>';
+    document.getElementById('esteban-detail').appendChild(row);
+    document.getElementById('compartidos-empty').style.display = 'none';
+    document.getElementById('acc-compartidos-detail').classList.add('open');
+    updateCompartidosCount();
+    if (moneyHidden) {
+      var mv = row.querySelector('.money-value');
+      mv.setAttribute('data-real', mv.textContent); mv.textContent = '••••';
+    }
+    recomputeEstebanBalance();
   }
-
+  function updateLinkedCompartidoAmount(sourceRowId, newAmount, newDesc){
+    var linked = document.querySelector('#esteban-detail .card[data-source-expense-id="' + sourceRowId + '"]');
+    if (!linked) return;
+    linked.setAttribute('data-amount', newAmount);
+    var who = linked.getAttribute('data-who');
+    var displayAmt = who === 'yo' ? newAmount / 2 : newAmount;
+    var sign = who === 'yo' ? '+' : '-';
+    var mv = linked.querySelector('.money-value');
+    if (mv) {
+      var text = sign + 'US$ ' + displayAmt.toLocaleString('es-CL');
+      if (moneyHidden) { mv.setAttribute('data-real', text); mv.textContent = '••••'; } else { mv.textContent = text; }
+    }
+    if (newDesc !== undefined) {
+      var descEl = linked.querySelector('div > div');
+      if (descEl) descEl.textContent = newDesc;
+    }
+    recomputeEstebanBalance();
+  }
+  function removeLinkedCompartido(sourceRowId){
+    var linked = document.querySelector('#esteban-detail .card[data-source-expense-id="' + sourceRowId + '"]');
+    if (linked) linked.remove();
+    recomputeEstebanBalance();
+    if (document.querySelectorAll('#esteban-detail .card').length === 0) {
+      var empty = document.getElementById('compartidos-empty');
+      if (empty) empty.style.display = 'block';
+    }
+    updateCompartidosCount();
+  }
   function saveCompartido(){
     var amount = parseFloat(document.getElementById('comp-amount').value) || 0;
     var desc = document.getElementById('comp-desc').value.trim() || (currentLang === 'en' ? 'Shared expense' : 'Gasto compartido');
     var dayBtn = document.querySelector('#comp-day-chips .chip-on');
     var day = dayBtn ? parseInt(dayBtn.getAttribute('data-day'), 10) : 0;
+    var catBtn = document.querySelector('#comp-cat-chips .chip-on');
+    var catLabel = catBtn ? catBtn.textContent.trim() : '';
     var payBtn = document.querySelector('#comp-pay-chips .chip-on');
     var payLabel = payBtn ? payBtn.textContent.trim() : '';
     var whoEl = document.querySelector('input[name="comp-quien"]:checked');
     var who = whoEl ? whoEl.value : 'yo';
 
-    var dayText = day ? ((currentLang === 'en' ? 'Day ' : 'Día ') + day + ' · ') : '';
-    var whoText = who === 'yo' ? (currentLang === 'en' ? 'you paid, 50/50' : 'pagaste tú, 50/50') : (currentLang === 'en' ? 'Esteban paid for you' : 'Esteban pagó por ti');
-    var sign = who === 'yo' ? '+' : '-';
-    var displayAmt = who === 'yo' ? (amount / 2) : amount;
-
-    var row = document.createElement('div');
-    row.className = 'card'; row.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; gap: 10px;';
-    row.innerHTML =
-      '<div style="flex: 1;"><div style="font-size: 13px; font-weight: 600;">' + desc + '</div><div style="color: var(--text-muted); font-size: 11px;">' + dayText + whoText + ' · ' + payLabel + '</div></div>' +
-      '<span class="money-value" style="color: ' + (who === 'yo' ? 'var(--green)' : 'var(--orange)') + '; font-size: 13px; font-weight: 700;">' + sign + 'US$ ' + displayAmt.toLocaleString('es-CL') + '</span>';
-    document.getElementById('esteban-detail').appendChild(row);
-    document.getElementById('compartidos-empty').style.display = 'none';
-
-    if (who === 'yo') state.esteban += amount / 2; else state.esteban -= amount;
+    addCompartidoDetailRow(desc, day, catLabel, payLabel, who, amount);
     updateEstebanDisplay();
     document.getElementById('comp-amount').value = '0'; document.getElementById('comp-desc').value = '';
     go('compartidos'); saveState();
   }
 
-  function editBudget(){
-    document.getElementById('budget-usd-value').value = state.budget;
-    document.getElementById('budget-clp-value').value = Math.round(state.budget * RATE_CLP);
-    document.getElementById('budget-edit-row').classList.add('show');
+  function editCompartido(btn){
+    var row = btn.closest('.card');
+    var mv = row.querySelector('.money-value');
+    var who = row.getAttribute('data-who');
+    var currentFull = parseFloat(row.getAttribute('data-amount')) || 0;
+    var currentDisplay = who === 'yo' ? currentFull / 2 : currentFull;
+    var input = document.createElement('input');
+    input.type = 'text'; input.value = currentDisplay;
+    input.style.cssText = 'width:70px; text-align:right; background: var(--bg); border: 1px solid var(--blue); border-radius: 6px; color: var(--text); font-size: 13px; font-weight: 700; padding: 3px 6px;';
+    mv.replaceWith(input);
+    input.focus(); input.select();
+    function commit(){
+      var newDisplay = parseFloat(input.value) || 0;
+      var newFull = who === 'yo' ? newDisplay * 2 : newDisplay;
+      row.setAttribute('data-amount', newFull);
+      var sourceId = row.getAttribute('data-source-expense-id');
+      if (sourceId) {
+        var srcRow = document.getElementById(sourceId);
+        if (srcRow) srcRow.setAttribute('data-amount', newFull);
+      }
+      var span = document.createElement('span');
+      span.className = 'money-value';
+      span.style.cssText = 'color: ' + (who === 'yo' ? 'var(--green)' : 'var(--orange)') + '; font-size: 13px; font-weight: 700;';
+      span.textContent = (who === 'yo' ? '+' : '-') + 'US$ ' + newDisplay.toLocaleString('es-CL');
+      input.replaceWith(span);
+      recomputeEstebanBalance();
+      updateEstebanDisplay(); updateBudgetDisplays(); renderCategoryBreakdown(); saveState();
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') input.blur(); });
   }
-  function syncBudgetFromUsd(){
-    var usd = parseFloat(document.getElementById('budget-usd-value').value) || 0;
-    document.getElementById('budget-clp-value').value = Math.round(usd * RATE_CLP);
+  function deleteCompartido(btn){
+    var row = btn.closest('.card');
+    var sourceId = row.getAttribute('data-source-expense-id');
+    row.remove();
+    if (sourceId) {
+      var srcRow = document.getElementById(sourceId);
+      if (srcRow) srcRow.setAttribute('data-quien', 'solo');
+    }
+    if (document.querySelectorAll('#esteban-detail .card').length === 0) {
+      var empty = document.getElementById('compartidos-empty');
+      if (empty) empty.style.display = 'block';
+    }
+    updateCompartidosCount();
+    recomputeEstebanBalance();
+    updateEstebanDisplay(); saveState();
   }
-  function syncBudgetFromClp(){
-    var clp = parseFloat(document.getElementById('budget-clp-value').value) || 0;
-    document.getElementById('budget-usd-value').value = Math.round(clp / RATE_CLP);
+  function updateCompartidosCount(){
+    var count = document.querySelectorAll('#esteban-detail .card').length;
+    var el = document.getElementById('compartidos-count');
+    if (el) el.textContent = count + ' ' + (currentLang === 'en' ? (count === 1 ? 'entry' : 'entries') : 'movimientos');
   }
-  function confirmBudget(){
-    var val = parseFloat(document.getElementById('budget-usd-value').value);
-    if (!val || val <= 0) return;
-    state.budget = val;
+
+  function editEstimated(){
+    document.getElementById('edit-estimado-input').value = state.estimatedBudget;
+    document.getElementById('edit-estimado-row').classList.add('show');
+  }
+  function confirmEditEstimated(){
+    var val = parseFloat(document.getElementById('edit-estimado-input').value);
+    if (isNaN(val) || val < 0) return;
+    state.estimatedBudget = val;
+    document.getElementById('edit-estimado-row').classList.remove('show');
     updateBudgetDisplays();
-    document.getElementById('budget-edit-row').classList.remove('show');
     saveState();
   }
 
+  function editBalance(method){
+    document.getElementById('edit-' + method + '-input').value = state.balances[method];
+    document.getElementById('edit-' + method + '-row').classList.add('show');
+  }
+  function confirmEditBalance(method){
+    var val = parseFloat(document.getElementById('edit-' + method + '-input').value);
+    if (!val || val < 0) return;
+    state.balances[method] = val;
+    document.getElementById('edit-' + method + '-row').classList.remove('show');
+    updateBudgetDisplays();
+    saveState();
+  }
+
+  function computePaymentTotals(){
+    var totals = { efectivo: 0, credito: 0, debito: 0 };
+    document.querySelectorAll('.day-expenses .expense-row').forEach(function(row){
+      var code = row.getAttribute('data-pay') || 'efectivo';
+      if (!(code in totals)) code = 'efectivo';
+      var amt = parseFloat(row.getAttribute('data-amount')) || 0;
+      totals[code] += amt;
+    });
+    return totals;
+  }
+
   function updateBudgetDisplays(){
-    var pct = Math.max(0, Math.min(100, Math.round((state.spent / state.budget) * 100)));
+    var totals = computePaymentTotals();
+    var totalBudget = 0, totalSpent = 0;
+    ['efectivo','credito','debito'].forEach(function(m){
+      var initial = state.balances[m];
+      var spent = totals[m];
+      var avail = initial - spent;
+      totalBudget += initial; totalSpent += spent;
+      setMoney(document.getElementById('bal-' + m + '-inicial'), 'US$ ' + initial.toLocaleString('es-CL'));
+      setMoney(document.getElementById('bal-' + m + '-gastado'), 'US$ ' + spent.toLocaleString('es-CL'));
+      var availEl = document.getElementById('bal-' + m + '-disp');
+      setMoney(availEl, 'US$ ' + avail.toLocaleString('es-CL'));
+      availEl.style.color = avail < 0 ? 'var(--red)' : 'var(--green)';
+      var homeEl = document.getElementById('home-bal-' + m);
+      if (homeEl) { setMoney(homeEl, 'US$ ' + avail.toLocaleString('es-CL')); homeEl.style.color = avail < 0 ? 'var(--red)' : 'var(--text)'; }
+    });
+    var pct = totalBudget > 0 ? Math.max(0, Math.min(100, Math.round((totalSpent / totalBudget) * 100))) : 0;
     var usedWord = currentLang === 'en' ? 'used' : 'usado';
-    setMoney(document.getElementById('home-avail'), 'US$ ' + (state.budget - state.spent).toLocaleString('es-CL'));
-    setMoney(document.getElementById('pres-budget-amount'), 'US$ ' + state.budget.toLocaleString('es-CL'));
-    setMoney(document.getElementById('pres-budget-clp'), '≈ $' + Math.round(state.budget * RATE_CLP).toLocaleString('es-CL') + ' CLP');
-    setMoney(document.getElementById('pres-spent'), 'US$ ' + state.spent.toLocaleString('es-CL'));
-    setMoney(document.getElementById('pres-avail2'), 'US$ ' + (state.budget - state.spent).toLocaleString('es-CL'));
+    setMoney(document.getElementById('presupuesto-estimado'), 'US$ ' + state.estimatedBudget.toLocaleString('es-CL'));
+    setMoney(document.getElementById('saldo-general-inicial'), 'US$ ' + totalBudget.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pres-budget-amount'), 'US$ ' + totalBudget.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pres-spent'), 'US$ ' + totalSpent.toLocaleString('es-CL'));
+    setMoney(document.getElementById('pres-avail2'), 'US$ ' + (totalBudget - totalSpent).toLocaleString('es-CL'));
     document.getElementById('pres-pct').innerHTML = pct + '% <span data-en="used">' + usedWord + '</span>';
     document.getElementById('pres-bar').style.width = pct + '%';
+
+    var cmpEl = document.getElementById('estimado-vs-real');
+    if (cmpEl) {
+      var diff = totalBudget - state.estimatedBudget;
+      var diffText, bg, color;
+      if (state.estimatedBudget === 0) {
+        diffText = currentLang === 'en' ? 'Set your estimated budget above to compare.' : 'Define tu presupuesto estimado arriba para comparar.';
+        bg = 'var(--card-alt)'; color = 'var(--text-muted)';
+      } else if (diff === 0) {
+        diffText = currentLang === 'en' ? '✓ Matches your estimate exactly' : '✓ Coincide exacto con tu estimado';
+        bg = '#0f2417'; color = 'var(--green)';
+      } else if (diff > 0) {
+        diffText = (currentLang === 'en' ? 'You\'re carrying US$' : 'Llevas US$') + Math.abs(diff).toLocaleString('es-CL') + (currentLang === 'en' ? ' more than estimated' : ' más de lo estimado');
+        bg = '#0f2417'; color = 'var(--green)';
+      } else {
+        diffText = (currentLang === 'en' ? 'You\'re carrying US$' : 'Llevas US$') + Math.abs(diff).toLocaleString('es-CL') + (currentLang === 'en' ? ' less than estimated' : ' menos de lo estimado');
+        bg = '#2a0f16'; color = 'var(--red)';
+      }
+      cmpEl.style.background = bg; cmpEl.style.color = color;
+      cmpEl.innerHTML = '<span class="money-value">' + diffText + '</span>';
+      if (moneyHidden && state.estimatedBudget !== 0) {
+        var mv = cmpEl.querySelector('.money-value');
+        mv.setAttribute('data-real', mv.textContent); mv.textContent = '••••';
+      }
+    }
   }
   function updateEstebanDisplay(){
     var bal = state.esteban;
@@ -1656,19 +2194,6 @@
     btn.disabled = true; btn.style.opacity = '0.6'; btn.style.cursor = 'default';
     document.querySelectorAll('#esteban-detail .card').forEach(function(c){ c.style.opacity = '0.5'; });
     saveState();
-  }
-
-  function computePaymentTotals(){
-    var totals = {efectivo: 0, credito: 0, debito: 0, transferencia: 0};
-    document.querySelectorAll('.day-expenses .expense-row').forEach(function(row){
-      var code = row.getAttribute('data-pay') || 'efectivo';
-      var amt = parseFloat(row.getAttribute('data-amount')) || 0;
-      totals[code] = (totals[code] || 0) + amt;
-    });
-    setMoney(document.getElementById('pay-total-efectivo'), 'US$ ' + totals.efectivo.toLocaleString('es-CL'));
-    setMoney(document.getElementById('pay-total-credito'), 'US$ ' + totals.credito.toLocaleString('es-CL'));
-    setMoney(document.getElementById('pay-total-debito'), 'US$ ' + totals.debito.toLocaleString('es-CL'));
-    setMoney(document.getElementById('pay-total-transferencia'), 'US$ ' + totals.transferencia.toLocaleString('es-CL'));
   }
 
   function recalcConvert(){
@@ -1770,19 +2295,182 @@
     svg.innerHTML = parts.join('');
   }
 
-  function renderRadar(){
-    var pct = state.spent > 0 ? Math.min(100, Math.round((state.imprevistoTotal / state.spent) * 100)) : 0;
-    var svg = document.getElementById('radar-svg');
-    if (svg) {
-      var circumference = Math.PI * 40;
-      var filled = (pct / 100) * circumference;
-      var color = pct > 30 ? '#ff4d5e' : (pct > 15 ? '#e0b83f' : '#6fe08a');
-      svg.innerHTML =
-        '<path d="M10,55 A40,40 0 0 1 90,55" fill="none" stroke="#1a2440" stroke-width="9" stroke-linecap="round"/>' +
-        '<path d="M10,55 A40,40 0 0 1 90,55" fill="none" stroke="' + color + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + filled + ' ' + circumference + '"' + (pct > 30 ? ' style="filter:drop-shadow(0 0 5px ' + color + ')"' : '') + '/>';
+  var CATS = [
+    {code:'alojamiento', icon:'🏨', es:'Alojamiento', en:'Lodging'},
+    {code:'transporte', icon:'🚕', es:'Transporte', en:'Transport'},
+    {code:'comida', icon:'🍔', es:'Comida', en:'Food'},
+    {code:'entradas', icon:'🎟', es:'Entradas/actividades', en:'Tickets/activities'},
+    {code:'compras', icon:'🛍', es:'Compras', en:'Shopping'},
+    {code:'regalos', icon:'🎁', es:'Regalos', en:'Gifts'},
+    {code:'propinas', icon:'🙌', es:'Propinas', en:'Tips'},
+    {code:'otra', icon:'➕', es:'Otra', en:'Other'}
+  ];
+  var DAY_DATES = {1:'7 oct',2:'8 oct',3:'9 oct',4:'10 oct',5:'11 oct',6:'12 oct'};
+  var PAY_ICONS = {efectivo:'💵', credito:'💳', debito:'💳'};
+  var PAY_LABELS_ES = {efectivo:'Efectivo', credito:'Crédito', debito:'Débito'};
+  function allCategories(){
+    return CATS.concat(state.customCategories.map(function(c){ return {code: c.code, icon: c.icon, es: c.label, en: c.label, custom: true}; }));
+  }
+  function mapCatCode(label){
+    if (/Alojamiento|Lodging/i.test(label)) return 'alojamiento';
+    if (/Transporte|Transport/i.test(label)) return 'transporte';
+    if (/Comida|Food/i.test(label)) return 'comida';
+    if (/Entradas|Tickets/i.test(label)) return 'entradas';
+    if (/Compras|Shopping/i.test(label)) return 'compras';
+    if (/Regalos|Gifts/i.test(label)) return 'regalos';
+    if (/Propinas|Tips/i.test(label)) return 'propinas';
+    var custom = state.customCategories.filter(function(c){ return label.indexOf(c.label) !== -1; })[0];
+    if (custom) return custom.code;
+    return 'otra';
+  }
+  function addCustomCategory(){
+    var input = document.getElementById('new-cat-name');
+    var name = input.value.trim();
+    if (!name) return;
+    var code = 'custom_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '') + '_' + Date.now();
+    state.customCategories.push({ code: code, label: name, icon: '📌' });
+    input.value = '';
+    document.getElementById('new-cat-row').classList.remove('show');
+    addCatChip(name);
+    renderCategoryBreakdown();
+    saveState();
+  }
+  function addCatChip(name){
+    var wrap = document.getElementById('gasto-cat-chips');
+    if (!wrap) return;
+    var btn = document.createElement('button');
+    btn.className = 'chip chip-off';
+    btn.textContent = '📌 ' + name;
+    btn.onclick = function(){ selectChip(btn, 'gasto-cat-chips'); };
+    wrap.appendChild(btn);
+  }
+  function renderCategoryBreakdown(){
+    var container = document.getElementById('category-breakdown');
+    var emptyEl = document.getElementById('category-empty');
+    if (!container) return;
+    if (emptyEl) emptyEl.style.display = 'none';
+    var cats = allCategories();
+    var grouped = {};
+    cats.forEach(function(c){ grouped[c.code] = []; });
+    document.querySelectorAll('.day-expenses .expense-row[data-cat]').forEach(function(row){
+      var code = row.getAttribute('data-cat') || 'otra';
+      if (!grouped[code]) grouped[code] = [];
+      grouped[code].push(row);
+    });
+    var html = '';
+    cats.forEach(function(c){
+      var rows = grouped[c.code] || [];
+      var total = 0;
+      var itemsHtml = rows.map(function(row){
+        var amt = parseFloat(row.getAttribute('data-amount')) || 0;
+        total += amt;
+        var day = row.getAttribute('data-day');
+        var pay = row.getAttribute('data-pay');
+        var desc = row.getAttribute('data-desc') || '';
+        return '<div class="cat-item-row" id="cat-item-' + row.id + '" style="padding:6px 0; border-bottom:1px solid var(--border);">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">' +
+          '<div style="flex:1;"><div style="font-weight:600;">' + desc + '</div><div style="color:var(--text-muted); font-size:10px;">' + (currentLang === 'en' ? 'Day ' : 'Día ') + day + ' · ' + (DAY_DATES[day] || '') + ' · ' + (PAY_ICONS[pay] || '') + '</div></div>' +
+          '<button onclick="startInlineCatEdit(\'' + row.id + '\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0;" title="Editar">✎</button>' +
+          '<div class="money-value" style="font-weight:700;">US$ ' + amt.toLocaleString('es-CL') + '</div>' +
+          '<button onclick="deleteCatExpense(\'' + row.id + '\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0;" title="Eliminar">🗑</button>' +
+          '</div></div>';
+      }).join('') || ('<div style="color: var(--text-muted); font-size: 11px; padding: 6px 0;" data-en="No expenses in this category yet.">Sin gastos en esta categoría aún.</div>');
+      var accId = 'cat-acc-' + c.code;
+      html += '<div class="acc-item" id="' + accId + '" style="margin-bottom:8px;">' +
+        '<div class="acc-header" onclick="toggleAcc(\'' + accId + '\')">' +
+        '<div class="acc-icon">' + c.icon + '</div>' +
+        '<div class="acc-title-wrap"><div class="acc-title">' + (currentLang === 'en' ? c.en : c.es) + '</div><div class="acc-badge money-value">US$ ' + total.toLocaleString('es-CL') + '</div></div>' +
+        '<svg class="acc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>' +
+        '</div><div class="acc-body">' + itemsHtml + '</div></div>';
+    });
+    container.innerHTML = html;
+    if (moneyHidden) {
+      document.querySelectorAll('#category-breakdown .money-value').forEach(function(el){
+        el.setAttribute('data-real', el.textContent); el.textContent = '••••';
+      });
     }
-    var label = document.getElementById('radar-pct-label');
-    if (label) label.textContent = pct + '%';
+  }
+  function exportCSV(){
+    var cats = allCategories();
+    var rows = [['Fecha','Día','Categoría','Descripción','Forma de pago','Monto USD']];
+    document.querySelectorAll('.day-expenses .expense-row[data-cat]').forEach(function(row){
+      var day = row.getAttribute('data-day');
+      var cat = row.getAttribute('data-cat');
+      var catInfo = cats.filter(function(c){ return c.code === cat; })[0];
+      var desc = row.getAttribute('data-desc') || '';
+      var pay = row.getAttribute('data-pay');
+      var amt = row.getAttribute('data-amount');
+      rows.push([DAY_DATES[day] || '', 'Día ' + day, catInfo ? catInfo.es : cat, desc, PAY_LABELS_ES[pay] || pay, amt]);
+    });
+    var csv = rows.map(function(r){
+      return r.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'gastos-diego-nyc.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function startInlineCatEdit(rowId){
+    var container = document.getElementById('cat-item-' + rowId);
+    var row = document.getElementById(rowId);
+    if (!container || !row) return;
+    var desc = (row.getAttribute('data-desc') || '').replace(/"/g, '&quot;');
+    var amt = parseFloat(row.getAttribute('data-amount')) || 0;
+    var pay = row.getAttribute('data-pay') || 'efectivo';
+    var payDefs = [
+      { code: 'efectivo', label: '💵 ' + (currentLang === 'en' ? 'Cash' : 'Efectivo') },
+      { code: 'credito', label: '💳 ' + (currentLang === 'en' ? 'Credit' : 'Crédito') },
+      { code: 'debito', label: '💳 ' + (currentLang === 'en' ? 'Debit' : 'Débito') }
+    ];
+    var payChips = payDefs.map(function(p){
+      return '<button type="button" class="chip ' + (pay === p.code ? 'chip-on' : 'chip-off') + '" data-pay="' + p.code + '" onclick="selectInlinePay(this)" style="font-size:11px;">' + p.label + '</button>';
+    }).join('');
+    container.innerHTML =
+      '<div style="padding:8px 0;">' +
+        '<input type="text" id="edit-desc-' + rowId + '" value="' + desc + '" placeholder="' + (currentLang === 'en' ? 'Description' : 'Descripción') + '" style="width:100%; background: var(--bg); border:1px solid var(--blue); border-radius:6px; color:var(--text); font-size:12px; padding:7px; margin-bottom:6px; box-sizing:border-box;">' +
+        '<div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">' +
+          '<span style="color:var(--gold); font-size:12px; font-weight:700;">US$</span>' +
+          '<input type="text" id="edit-amt-' + rowId + '" value="' + amt + '" style="flex:1; background: var(--bg); border:1px solid var(--blue); border-radius:6px; color:var(--text); font-size:12px; padding:7px; box-sizing:border-box;">' +
+        '</div>' +
+        '<div style="display:flex; gap:6px; margin-bottom:8px;" id="edit-pay-' + rowId + '">' + payChips + '</div>' +
+        '<div style="display:flex; gap:6px;">' +
+          '<button onclick="commitInlineCatEdit(\'' + rowId + '\')" style="flex:1; background:var(--gold); color:#05060d; border:none; border-radius:8px; padding:9px; font-size:12px; font-weight:700; cursor:pointer;" data-en="Save">Guardar</button>' +
+          '<button onclick="renderCategoryBreakdown()" style="flex:1; background:var(--card-alt); color:var(--text-muted); border:1px solid var(--border); border-radius:8px; padding:9px; font-size:12px; cursor:pointer;" data-en="Cancel">Cancelar</button>' +
+        '</div>' +
+      '</div>';
+  }
+  function selectInlinePay(btn){
+    var group = btn.parentElement;
+    group.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('chip-on'); c.classList.add('chip-off'); });
+    btn.classList.remove('chip-off'); btn.classList.add('chip-on');
+  }
+  function commitInlineCatEdit(rowId){
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    var descInput = document.getElementById('edit-desc-' + rowId);
+    var amtInput = document.getElementById('edit-amt-' + rowId);
+    var newDesc = descInput.value.trim() || row.getAttribute('data-desc');
+    var newAmt = parseFloat(amtInput.value);
+    if (isNaN(newAmt) || newAmt < 0) newAmt = parseFloat(row.getAttribute('data-amount')) || 0;
+    var payBtn = document.querySelector('#edit-pay-' + rowId + ' .chip-on');
+    var newPay = payBtn ? payBtn.getAttribute('data-pay') : row.getAttribute('data-pay');
+    row.setAttribute('data-desc', newDesc);
+    row.setAttribute('data-amount', newAmt);
+    row.setAttribute('data-pay', newPay);
+    var quien = row.getAttribute('data-quien');
+    if (quien === 'comp1' || quien === 'comp2') updateLinkedCompartidoAmount(rowId, newAmt, newDesc);
+    updateBudgetDisplays(); updateEstebanDisplay(); renderItinerario(); renderCategoryBreakdown(); checkMilestones(); saveState();
+  }
+  function deleteCatExpense(rowId){
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    var quien = row.getAttribute('data-quien');
+    if (quien === 'comp1' || quien === 'comp2') removeLinkedCompartido(rowId);
+    row.remove();
+    updateBudgetDisplays(); updateEstebanDisplay(); renderItinerario(); renderCategoryBreakdown(); checkMilestones(); saveState();
   }
 
   function startEditAmount(btn){
@@ -1796,33 +2484,25 @@
     input.focus(); input.select();
     function commit(){
       var newVal = parseFloat(input.value) || 0;
-      var delta = newVal - current;
       row.setAttribute('data-amount', newVal);
-      state.spent += delta;
-      if (row.getAttribute('data-imprevisto') === '1') state.imprevistoTotal += delta;
       var quien = row.getAttribute('data-quien');
-      if (quien === 'comp1') state.esteban += delta / 2;
-      if (quien === 'comp2') state.esteban -= delta;
+      if (quien === 'comp1' || quien === 'comp2') updateLinkedCompartidoAmount(row.id, newVal);
       var newSpan = document.createElement('div');
       newSpan.className = 'money-value';
       newSpan.style.cssText = 'font-size: 14px; font-weight: 700;';
       newSpan.textContent = 'US$ ' + newVal.toLocaleString('es-CL');
       input.replaceWith(newSpan);
-      updateBudgetDisplays(); updateEstebanDisplay(); computePaymentTotals(); renderItinerario(); renderRadar(); checkMilestones(); saveState();
+      updateBudgetDisplays(); updateEstebanDisplay(); renderItinerario(); renderCategoryBreakdown(); checkMilestones(); saveState();
     }
     input.addEventListener('blur', commit);
     input.addEventListener('keydown', function(e){ if (e.key === 'Enter') input.blur(); });
   }
   function deleteExpenseRow(btn){
     var row = btn.closest('.expense-row');
-    var amount = parseFloat(row.getAttribute('data-amount')) || 0;
-    state.spent -= amount;
-    if (row.getAttribute('data-imprevisto') === '1') state.imprevistoTotal -= amount;
     var quien = row.getAttribute('data-quien');
-    if (quien === 'comp1') state.esteban -= amount / 2;
-    if (quien === 'comp2') state.esteban += amount;
+    if (quien === 'comp1' || quien === 'comp2') removeLinkedCompartido(row.id);
     row.remove();
-    updateBudgetDisplays(); updateEstebanDisplay(); computePaymentTotals(); renderItinerario(); renderRadar(); checkMilestones(); saveState();
+    updateBudgetDisplays(); updateEstebanDisplay(); renderItinerario(); renderCategoryBreakdown(); checkMilestones(); saveState();
   }
 
   function seedItinerario(){
@@ -1859,7 +2539,7 @@
     });
   }
 
-  seedItinerario();
+  /* seedItinerario() ya no se llama — Itinerario arranca sin gastos de ejemplo */
   updatePackBadge();
   updatePendBadge();
   updatePanoCount();
@@ -1870,7 +2550,9 @@
   renderItinerario();
   refreshItineraryPanoramas();
   addMapsLinksToPanoramas();
-  renderRadar();
+  retrofitPanoramaControls();
+  retrofitPackRowControls();
+  renderCategoryBreakdown();
   checkMilestones();
   recalcConvert();
   /* ---------- SERVICE WORKER Y AVISO DE ACTUALIZACION ---------- */
@@ -1918,7 +2600,7 @@
   updateEstebanDisplay();
   computePaymentTotals();
   renderItinerario();
-  renderRadar();
+  renderCategoryBreakdown();
   checkMilestones();
 </script>
 </body>

@@ -1,7 +1,7 @@
 // Diego NYC Oct '26 — Service Worker
 // Sube este número cada vez que modifiques la app (index.html, manifest, íconos, etc.)
 // para que el navegador detecte la nueva versión y el banner de "Actualización disponible" aparezca.
-const SW_VERSION = 'v1.0.0';
+const SW_VERSION = 'v1.2.0';
 const CACHE_NAME = 'diego-nyc-' + SW_VERSION;
 
 const CORE_ASSETS = [
@@ -51,8 +51,9 @@ self.addEventListener('fetch', function (event) {
   if (req.method !== 'GET') return;
 
   var isNavigation = req.mode === 'navigate' || (req.headers.get('accept') || '').indexOf('text/html') !== -1;
+  var isWeatherAPI = req.url.indexOf('api.open-meteo.com') !== -1;
 
-  if (isNavigation) {
+  if (isNavigation || isWeatherAPI) {
     event.respondWith(
       fetch(req).then(function (res) {
         var resClone = res.clone();
@@ -60,7 +61,7 @@ self.addEventListener('fetch', function (event) {
         return res;
       }).catch(function () {
         return caches.match(req).then(function (cached) {
-          return cached || caches.match('./index.html');
+          return cached || (isNavigation ? caches.match('./index.html') : undefined);
         });
       })
     );
