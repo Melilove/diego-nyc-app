@@ -427,7 +427,7 @@
           <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
           <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Empire State Building</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 350 Fifth Ave, Manhattan</div></div>
         </div>
-        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2" selected>Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
       </div>
 
       <div class="card panorama-item" data-id="p3" data-cat="comic" data-visited="false" style="padding: 12px 14px;">
@@ -467,15 +467,7 @@
           <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
           <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">The High Line</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Gansevoort St a W 34th St, Manhattan</div></div>
         </div>
-        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
-      </div>
-
-      <div class="card panorama-item" data-id="p8" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
-        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
-          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
-          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Brooklyn Bridge</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Entre City Hall Park (Manhattan) y Cadman Plaza (Brooklyn)</div></div>
-        </div>
-        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3" selected>Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
       </div>
 
       <div class="card panorama-item" data-id="p9" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
@@ -617,7 +609,15 @@
       <div class="card panorama-item" data-id="c10" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
         <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
           <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
-          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Brooklyn (DUMBO / Brooklyn Heights)</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 DUMBO, Brooklyn</div></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Brooklyn Bridge</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Brooklyn Bridge, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4" selected>Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="c10b" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">DUMBO</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 DUMBO, Brooklyn</div></div>
         </div>
         <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4" selected>Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
       </div>
@@ -644,6 +644,79 @@
           <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">The Met</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 1000 5th Ave, Manhattan</div></div>
         </div>
         <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5" selected>Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n1" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Llegada al hotel</div><span style="color: var(--text-muted); font-size: 10px;">🏨 <span data-en="Check-in">Check-in</span></span></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1" selected>Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n2" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Bryant Park</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Bryant Park, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1" selected>Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n3" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Memorial 9/11</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 180 Greenwich St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2" selected>Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+
+      <div class="card panorama-item" data-id="n5" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Time Out Market DUMBO — Bark Barbecue</div><span style="color: var(--text-muted); font-size: 10px;">🛍 <span data-en="Texas-Dominican BBQ, 5th floor — rooftop views of the Brooklyn Bridge">Asado tejano-dominicano, 5to piso — vista al puente</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 55 Water St, Brooklyn</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4" selected>Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n6" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">East Village</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic">Clásico</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 East Village, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4" selected>Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n7" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Circle Line Cruise</div><span style="color: var(--text-muted); font-size: 10px;">🚢 <span data-en="Boat cruise">Crucero en barco</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Pier 83, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4" selected>Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n8" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Intrepid Museum</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Group splits here — Diego or Esteban">Acá se dividen — va Diego o Esteban</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 Pier 86, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5" selected>Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n8b" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">MoMA</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Group splits here — Diego or Esteban">Acá se dividen — va Diego o Esteban</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 11 W 53rd St, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5" selected>Día 5</option><option value="6">Día 6</option></select></div>
+      </div>
+
+      <div class="card panorama-item" data-id="n9" data-cat="clasico" data-visited="false" style="padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleVisit(this.parentElement)">
+          <div class="check-circle" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a3654; flex-shrink: 0;"></div>
+          <div style="flex: 1;"><div class="p-name" style="font-size: 14px; font-weight: 700;">Desfile Columbus Day</div><span style="color: var(--text-muted); font-size: 10px;">🗽 <span data-en="Classic · 11:30am-3:30pm">Clásico · 11:30am-3:30pm</span></span><div style="color: var(--text-dim); font-size: 10px;">📌 5th Ave, Manhattan</div></div>
+        </div>
+        <div style="margin-top: 8px;"><select class="pano-day-select" onchange="setPanoDay(this)"><option value="0">Sin día</option><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6" selected>Día 6</option></select></div>
       </div>
 
       <button onclick="document.getElementById('panorama-add-row').classList.toggle('show')" style="margin-top: 4px; background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; color: var(--gold); font-size: 13px; font-weight: 700; cursor: pointer;" data-en="+ Add spot">+ Agregar panorama</button>
@@ -679,6 +752,7 @@
           <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
         </div>
         <div class="day-body">
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;" data-en="Flight lands 9:40 AM.">Llegada del vuelo 9:40 AM.</div>
           <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-1"></div>
           <button onclick="document.getElementById('day-place-add-1').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
@@ -784,11 +858,7 @@
           <svg class="day-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
         </div>
         <div class="day-body">
-          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;" data-en="Flight back to Chile. Heads up: Columbus Day Parade runs 5th Ave. 11:30am-3:30pm — check it fits before heading to the airport.">Vuelo de regreso a Chile. Ojo: el Columbus Day Parade pasa por la 5ta Ave. de 11:30am a 3:30pm — revisa si calza antes de ir al aeropuerto.</div>
-          <div class="suggest-card" style="border-color: var(--green);">
-            <span style="color: var(--green); font-size: 11px; font-weight: 700;" data-en="✅ Confirmed">✅ Confirmado</span>
-            <div style="font-size: 13px; font-weight: 600; margin-top: 4px;" data-en="Shopping & odds and ends before heading to the airport">Compras y otros antes de ir al aeropuerto</div>
-          </div>
+          <div style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;" data-en="Flight back to Chile departs 19:50 — there's time to catch the parade first.">Vuelo de regreso a Chile sale a las 19:50 — alcanza bien para ver el desfile antes.</div>
           <div style="color: var(--gold); font-size: 11px; font-weight: 700; margin-bottom: 4px;" data-en="📍 Places for this day">📍 Lugares de este día</div>
           <div class="day-panoramas" id="day-panoramas-6"></div>
           <button onclick="document.getElementById('day-place-add-6').classList.toggle('show')" style="width:100%; background: var(--card); border: 1px dashed var(--border); border-radius: 10px; padding: 8px; color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 8px;" data-en="+ Other places">+ Otros lugares</button>
@@ -1216,7 +1286,7 @@
 </div>
 
 <script>
-  var state = { balances: { efectivo: 0, credito: 0, debito: 0 }, esteban: 0, estebanSettled: false, panoVisited: 0, panoTotal: 28, customDocCount: 0, imprevistoTotal: 0, customCategories: [], estimatedBudget: 0 };
+  var state = { balances: { efectivo: 0, credito: 0, debito: 0 }, esteban: 0, estebanSettled: false, panoVisited: 0, panoTotal: 37, customDocCount: 0, imprevistoTotal: 0, customCategories: [], estimatedBudget: 0 };
   var currentLang = 'es';
   var moneyHidden = false;
   var STORE_KEY = 'diego_nyc_state_v4';
